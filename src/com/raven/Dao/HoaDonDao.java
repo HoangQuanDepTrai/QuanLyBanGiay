@@ -29,14 +29,14 @@ public class HoaDonDao extends RavenDao<HoaDon, Integer> {
     public void insert(HoaDon entity) {
         JdbcHelper.update(INSERT_SQL, entity.isHinhThuc(), entity.getPhiGiao(), entity.getThanhTien(),
                 entity.getTienKhachTra(), entity.getNgayTao(), entity.getGioTao(), entity.getMaKH(),
-                entity.getMaTH(), entity.getMaNV());
+                entity.getMaTT(), entity.getMaNV());
     }
 
     @Override
     public void update(HoaDon entity) {
         JdbcHelper.update(UPDATE_SQL, entity.isHinhThuc(), entity.getPhiGiao(), entity.getThanhTien(),
                 entity.getTienKhachTra(), entity.getNgayTao(), entity.getGioTao(), entity.getMaKH(),
-                entity.getMaTH(), entity.getMaNV(), entity.getMaHD());
+                entity.getMaTT(), entity.getMaNV(), entity.getMaHD());
     }
 
     @Override
@@ -73,7 +73,7 @@ public class HoaDonDao extends RavenDao<HoaDon, Integer> {
                 entity.setNgayTao(rs.getDate("NGAYTAO"));
                 entity.setGioTao(rs.getTime("GIOTAO"));
                 entity.setMaKH(rs.getInt("MAKH"));
-                entity.setMaTH(rs.getInt("MATRANGTHAI"));
+                entity.setMaTT(rs.getInt("MATRANGTHAI"));
                 entity.setMaNV(rs.getString("MANV"));
                 list.add(entity);
             }

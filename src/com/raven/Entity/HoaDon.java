@@ -132,11 +132,11 @@ public class HoaDon {
         this.maKH = maKH;
     }
 
-    public int getMaTH() {
+    public int getMaTT() {
         return maTT;
     }
 
-    public void setMaTH(int maTT) {
+    public void setMaTT(int maTT) {
         this.maTT = maTT;
     }
 
