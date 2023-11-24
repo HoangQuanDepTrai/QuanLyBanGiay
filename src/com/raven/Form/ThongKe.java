@@ -74,6 +74,7 @@ public class ThongKe extends javax.swing.JPanel {
             public void propertyChange(PropertyChangeEvent evt) {
                 if ("date".equals(evt.getPropertyName())) {
                     fillThongKeThang();
+                    fillTableThongKeThang();
                 }
             }
         });
@@ -127,6 +128,20 @@ public class ThongKe extends javax.swing.JPanel {
             });
         }
     }
+    private void fillTableThongKeThang() {
+        DefaultTableModel model = (DefaultTableModel) tblDTThang.getModel();
+        model.setRowCount(0);
+        List<Object[]> list = tkDao.getTK_DT_TABLETHANG(dcTKThang.getMonth() + 1, ycTKThang.getYear(), cboTTThang.getSelectedItem().toString());
+        for (Object[] row : list) {
+            model.addRow(new Object[]{
+                row[0],
+                row[1],
+                row[2],
+                row[3]
+            });
+        }
+    }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -720,6 +735,7 @@ public class ThongKe extends javax.swing.JPanel {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 fillThongKeThang();
+                fillTableThongKeThang();
             }
         });
     }//GEN-LAST:event_cboTTThangActionPerformed
