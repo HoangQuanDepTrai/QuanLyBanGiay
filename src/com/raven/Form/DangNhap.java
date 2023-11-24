@@ -4,7 +4,11 @@
  */
 package com.raven.Form;
 
+import com.raven.Dao.NhanVienDao;
+import com.raven.Entity.QLNhanVien;
 import com.raven.Swing.JPanel_Login;
+import com.raven.uitils.Auth;
+import com.raven.uitils.MsgBox;
 import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
@@ -26,7 +30,6 @@ import javax.swing.JPanel;
  * @author Lê Minh Khôi
  */
 public class DangNhap extends javax.swing.JDialog {
-  
 
     public DangNhap(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
@@ -36,7 +39,7 @@ public class DangNhap extends javax.swing.JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (cbkHTMK.isSelected()) {
-                    txtMatKhau.setEchoChar((char) 0); 
+                    txtMatKhau.setEchoChar((char) 0);
                 } else {
                     txtMatKhau.setEchoChar('*');
                 }
@@ -44,7 +47,6 @@ public class DangNhap extends javax.swing.JDialog {
         });
     }
 
-     
     private int x;
     private int y;
 
@@ -64,8 +66,30 @@ public class DangNhap extends javax.swing.JDialog {
             }
 
         });
-        
+
     }
+
+    NhanVienDao dao = new NhanVienDao();
+
+    public void ketThuc() {
+        this.dispose();
+    }
+
+    void dangNhap() {
+        String manv = txtTenDN.getText();
+        String matKhau = new String(txtMatKhau.getPassword());
+        QLNhanVien nhanVien = dao.selectByid(manv);
+        if (nhanVien == null) {
+            MsgBox.alert(this, "Tên đăng nhập không đúng!!");
+        } else if (!matKhau.equals(nhanVien.getMatKhau())) {
+            MsgBox.alert(this, "Mật khẩu không đúng!! Vui lòng nhập lại!!");
+        } else {
+            Auth.user = nhanVien;
+            MsgBox.alert(this, "Đăng nhập thành công!!");
+            this.dispose();
+        }
+    }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -244,6 +268,7 @@ public class DangNhap extends javax.swing.JDialog {
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
         // TODO add your handling code here:
+        dangNhap();
     }//GEN-LAST:event_btnOKActionPerformed
 
     public static void main(String args[]) {

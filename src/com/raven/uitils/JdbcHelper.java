@@ -18,7 +18,7 @@ public class JdbcHelper {
             = "jdbc:sqlserver://LocalHost:1433;"
             + "database=QL_SHOPGIAY;"
             + "user=sa;"
-            + "password=090909Abc;"
+            + "password=123;"
             + "encrypt=false;"
             + "trustServerCertificate=false;"
             + "loginTimeout=30;";

@@ -4,12 +4,16 @@
  */
 package com.raven.Form;
 
+import com.raven.Dao.NhanVienDao;
+import com.raven.uitils.Auth;
+import com.raven.uitils.MsgBox;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -28,11 +32,11 @@ public class DoiMatKhau extends javax.swing.JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (chkHTMK.isSelected()) {
-                    txtMatKhauMoi.setEchoChar((char) 0); 
-                    txtMatKhaucu.setEchoChar((char)0);
-                    txtXNMatKhau.setEchoChar((char)0);
+                    txtMatKhauMoi.setEchoChar((char) 0);
+                    txtMatKhaucu.setEchoChar((char) 0);
+                    txtXNMatKhau.setEchoChar((char) 0);
                 } else {
-                    txtMatKhauMoi.setEchoChar('*'); 
+                    txtMatKhauMoi.setEchoChar('*');
                     txtMatKhaucu.setEchoChar('*');
                     txtXNMatKhau.setEchoChar('*');
                 }
@@ -40,7 +44,7 @@ public class DoiMatKhau extends javax.swing.JDialog {
         });
     }
 
-       private int x;
+    private int x;
     private int y;
 
     public void iniMoving(JDialog fr) {
@@ -59,8 +63,43 @@ public class DoiMatKhau extends javax.swing.JDialog {
             }
 
         });
-        
+
     }
+
+    void clearForm() {
+        txtTenDN.setText("");
+        txtMatKhaucu.setText("");
+        txtMatKhauMoi.setText("");
+        txtXNMatKhau.setText("");
+    }
+
+    NhanVienDao dao = new NhanVienDao();
+
+    private void doiMatKhau() {
+        String manv = txtTenDN.getText();
+        String matKhau = new String(txtMatKhaucu.getPassword());
+        String matKhauMoi = new String(txtMatKhauMoi.getPassword());
+        String matKhauMoi2 = new String(txtXNMatKhau.getPassword());
+
+        try {
+            if (!manv.equalsIgnoreCase(Auth.user.getManv())) {
+                MsgBox.alert(this, "Tên đăng nhập tài khoản hiện tại không đúng, vui lòng nhập lại!!");
+            } else if (!matKhau.equals(Auth.user.getMatKhau())) {
+                MsgBox.alert(this, "Sai mật khẩu!!");
+            } else if (!matKhauMoi.equals(matKhauMoi2)) {
+                MsgBox.alert(this, "Mật khẩu mới không trùng khớp!!");
+            } else {
+                Auth.user.setMatKhau(matKhauMoi);
+                dao.update(Auth.user);
+                MsgBox.alert(this, "Đổi mật khẩu thành công!!");
+                clearForm();
+                this.dispose();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Đã xảy ra lỗi: " + e.getMessage());
+        }
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -266,6 +305,7 @@ public class DoiMatKhau extends javax.swing.JDialog {
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
         // TODO add your handling code here:
+        doiMatKhau();
     }//GEN-LAST:event_btnOKActionPerformed
 
     private void btnThoatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThoatActionPerformed
