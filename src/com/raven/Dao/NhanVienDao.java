@@ -16,20 +16,26 @@ import java.util.List;
  */
 public class NhanVienDao extends RavenDao<QLNhanVien, String> {
 
-    final String INSERT_SQL = "INSERT INTO NHANVIEN (MANV, MATKHAU, TENNV, SODT, VAITRO) VALUES (?, ?, ?, ?, ?)";
-    final String UPDATE_SQL = "UPDATE NHANVIEN SET  MATKHAU = ?, TENNV = ?, SODT = ?, VAITRO = ? WHERE MANV = ?";
+    public List<QLNhanVien> selectByKeyword(String keyword) {
+        String SQL = "SELECT * FROM NHANVIEN WHERE TENNV LIKE ?";
+        return this.selectBysql(SQL, "%" + keyword + "%");
+    }
+
+    final String INSERT_SQL = "INSERT INTO NHANVIEN (MANV, MATKHAU, TENNV, GIOITINH, SODT,EMAIL , VAITRO, TRANGTHAINV) VALUES (?, ?, ?, ?, ?,?,?,?)";
+    final String UPDATE_SQL = "UPDATE NHANVIEN SET MATKHAU = ?, TENNV = ?, GIOITINH = ?, SODT = ?, EMAIL = ?, VAITRO = ?, TRANGTHAINV = ? WHERE MANV = ?";
     final String DELETE_SQL = "DELETE FROM NHANVIEN WHERE MANV = ?";
     final String SELECT_ALL_SQL = "SELECT * FROM NHANVIEN";
     final String SELECT_BY_ID_SQL = "SELECT * FROM NHANVIEN WHERE MANV = ?";
+    final String SELECT_NOT_IN_COURSE_SQL = "SELECT * FROM NHANVIEN WHERE TENNV LIKE ?";
 
     @Override
     public void insert(QLNhanVien entity) {
-        JdbcHelper.update(INSERT_SQL, entity.getManv(), entity.getMatKhau(), entity.getTenNV(), entity.getSDT(), entity.isVaiTro());
+        JdbcHelper.update(INSERT_SQL, entity.getManv(), entity.getMatKhau(), entity.getTenNV(), entity.isGioiTinh(), entity.getSDT(), entity.getEmail(), entity.isVaiTro(), entity.isTrangThaiNV());
     }
 
     @Override
     public void update(QLNhanVien entity) {
-        JdbcHelper.update(UPDATE_SQL, entity.getMatKhau(), entity.getTenNV(), entity.getSDT(), entity.isVaiTro(), entity.getManv());
+        JdbcHelper.update(UPDATE_SQL, entity.getMatKhau(), entity.getTenNV(), entity.isGioiTinh(), entity.getSDT(), entity.getEmail(), entity.isVaiTro(), entity.isTrangThaiNV(), entity.getManv());
     }
 
     @Override
@@ -61,8 +67,11 @@ public class NhanVienDao extends RavenDao<QLNhanVien, String> {
                 entity.setManv(rs.getString("MANV"));
                 entity.setMatKhau(rs.getString("MATKHAU"));
                 entity.setTenNV(rs.getString("TENNV"));
+                entity.setGioiTinh(rs.getBoolean("GioiTinh"));
                 entity.setSDT(rs.getString("SODT"));
+                entity.setEmail(rs.getString("EMAIL"));
                 entity.setVaiTro(rs.getBoolean("VAITRO"));
+                entity.setTrangThaiNV(rs.getBoolean("TRANGTHAINV"));
                 list.add(entity);
             }
 
@@ -71,5 +80,4 @@ public class NhanVienDao extends RavenDao<QLNhanVien, String> {
         }
         return list;
     }
-
 }

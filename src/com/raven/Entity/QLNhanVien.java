@@ -9,20 +9,27 @@ package com.raven.Entity;
  * @author Lê Minh Khôi
  */
 public class QLNhanVien {
+
     private String Manv;
     private String matKhau;
     private String tenNV;
     private String SDT;
+    private String Email;
+    private boolean GioiTinh;
+    private boolean TrangThaiNV;
     private boolean vaiTro;
 
     public QLNhanVien() {
     }
 
-    public QLNhanVien(String Manv, String matKhau, String tenNV, String SDT, boolean vaiTro) {
+    public QLNhanVien(String Manv, String matKhau, String tenNV, String SDT, String Email, boolean GioiTinh, boolean TrangThaiNV, boolean vaiTro) {
         this.Manv = Manv;
         this.matKhau = matKhau;
         this.tenNV = tenNV;
         this.SDT = SDT;
+        this.Email = Email;
+        this.GioiTinh = GioiTinh;
+        this.TrangThaiNV = TrangThaiNV;
         this.vaiTro = vaiTro;
     }
 
@@ -58,6 +65,30 @@ public class QLNhanVien {
         this.SDT = SDT;
     }
 
+    public String getEmail() {
+        return Email;
+    }
+
+    public void setEmail(String Email) {
+        this.Email = Email;
+    }
+
+    public boolean isGioiTinh() {
+        return GioiTinh;
+    }
+
+    public void setGioiTinh(boolean GioiTinh) {
+        this.GioiTinh = GioiTinh;
+    }
+
+    public boolean isTrangThaiNV() {
+        return TrangThaiNV;
+    }
+
+    public void setTrangThaiNV(boolean TrangThaiNV) {
+        this.TrangThaiNV = TrangThaiNV;
+    }
+
     public boolean isVaiTro() {
         return vaiTro;
     }
@@ -70,5 +101,5 @@ public class QLNhanVien {
     public String toString() {
         return this.tenNV;
     }
-    
+
 }
