@@ -1,4 +1,4 @@
- /*
+/*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
@@ -21,7 +21,7 @@ public class SanPhamDao extends RavenDao<QLSanPham, String> {
     final String INSERT_SQL = "INSERT INTO SANPHAM (MASP, TENSP, GIANHAP, GIABAN, SIZE, MAU, SOLUONG, "
             + "HINHANH, NGAYNHAP, MOTA, LOAI) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, (SELECT MALOAI FROM LOAI WHERE TENLOAI LIKE ?))";
     final String UPDATE_SQL = "UPDATE SANPHAM SET TENSP = ?, GIANHAP = ?, GIABAN = ?, SIZE = ?, MAU = ?,"
-            + " SOLUONG = ?, HINHANH = ?, NGAYNHAP = ?, MOTA = ?, LOAI = (SELECT MALOAI FROM LOAI WHERE TENLOAI LIKE ?) WHERE MASP = ?";
+            + " SOLUONG = ?, HINHANH = ?, NGAYNHAP = ?, MOTA = ?, LOAI = (SELECT MALOAI FROM LOAI WHERE TENLOAI = ?) WHERE MASP = ?";
     final String DELETE_SQL = "DELETE FROM SANPHAM WHERE MASP = ?";
     final String SELECT_ALL_SQL = "SELECT * FROM SANPHAM";
     final String SELECT_BY_ID_SQL = "SELECT * FROM SANPHAM WHERE MASP = ?";
@@ -83,24 +83,18 @@ public class SanPhamDao extends RavenDao<QLSanPham, String> {
             }
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
         return list;
     }
 
-    public List<QLSanPham> selectByName(String tenSP){
+    public List<QLSanPham> selectByName(String tenSP) {
         String SELECT_BY_NAME = "SELECT * FROM SANPHAM WHERE TENSP LIKE ?";
-        return selectBysql(SELECT_BY_NAME, "%"+tenSP+"%");
-       
+        return selectBysql(SELECT_BY_NAME, "%" + tenSP + "%");
+
     }
-    public QLSanPham selectByidTenLoai(String loai, String id) {
-        String SELECT_BY_ID_LOAI_SQL = "SELECT MASP,TENSP,GIANHAP,GIABAN,SIZE,MAU,SOLUONG,HINHANH,NGAYNHAP,MOTA,(SELECT TENLOAI FROM LOAI WHERE MALOAI = ?) AS LOAI FROM SANPHAM INNER JOIN LOAI ON SANPHAM.LOAI = LOAI.MALOAI WHERE MASP = ?";
-        List<QLSanPham> list = selectBysql(SELECT_BY_ID_LOAI_SQL, loai,id);
-        if (list.isEmpty()) {
-            return null;
-        }
-        return list.get(0);
-    }
+
+   
 
     public List<Mau> selectMau() {
         List<Mau> list = new ArrayList<>();
@@ -113,7 +107,7 @@ public class SanPhamDao extends RavenDao<QLSanPham, String> {
             }
             rs.getStatement().getConnection().close();
         } catch (Exception ex) {
-
+            ex.printStackTrace();
         }
         return list;
     }
@@ -129,9 +123,17 @@ public class SanPhamDao extends RavenDao<QLSanPham, String> {
             }
             rs.getStatement().getConnection().close();
         } catch (Exception ex) {
-
+            ex.printStackTrace();
         }
         return list;
+    }
+
+    public void update_by_tenloai(QLSanPham entity) {
+        String UPDATE_BY_TENLOAI = "UPDATE SANPHAM SET TENSP = ?, GIANHAP = ?, GIABAN = ?, SIZE = ?, MAU = ?,"
+                + " SOLUONG = ?, HINHANH = ?, NGAYNHAP = ?, MOTA = ?, LOAI = ? WHERE MASP = ?";
+        JdbcHelper.update(UPDATE_BY_TENLOAI, entity.getTenSp(), entity.getGiaNhap(), entity.getGiaBan(),
+                entity.getSize(), entity.getMau(), entity.getSoLuong(), entity.getHinhAnh(), entity.getNgayNhap(),
+                entity.getMoTa(), entity.getLoai(), entity.getMaSP());
     }
 
 }

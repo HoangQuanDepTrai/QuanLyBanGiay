@@ -8,13 +8,15 @@ import com.raven.Entity.HoaDonCT;
 import com.raven.uitils.JdbcHelper;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
  *
  * @author Lê Minh Khôi
  */
-public class HoaDonCTDao extends RavenDao<HoaDonCT, Integer>{
+public class HoaDonCTDao extends RavenDao<HoaDonCT, Integer> {
+
     final String INSERT_SQL = "INSERT INTO HOADONCT (GIA, TENSP, SOLUONG, SIZE, MASP, MAHD) VALUES (?, ?, ?, ?, ?, ?)";
     final String UPDATE_SQL = "UPDATE HOADONCT SET GIA = ?, TENSP = ?, SOLUONG = ?, SIZE = ?, MASP = ?, MAHD WHERE MACT = ?";
     final String DELETE_SQL = "DELETE FROM HOADONCT WHERE MACT = ?";
@@ -23,12 +25,12 @@ public class HoaDonCTDao extends RavenDao<HoaDonCT, Integer>{
 
     @Override
     public void insert(HoaDonCT entity) {
-        JdbcHelper.update(INSERT_SQL, entity.getGia(),entity.getTenSP(),entity.getSoLuong(),entity.getSize(),entity.getMaSP(),entity.getMaHD());
+        JdbcHelper.update(INSERT_SQL, entity.getGia(), entity.getTenSP(), entity.getSoLuong(), entity.getSize(), entity.getMaSP(), entity.getMaHD());
     }
 
     @Override
     public void update(HoaDonCT entity) {
-        JdbcHelper.update(UPDATE_SQL, entity.getGia(),entity.getTenSP(),entity.getSoLuong(),entity.getSize(),entity.getMaSP(),entity.getMaHD(),entity.getMaCT());
+        JdbcHelper.update(UPDATE_SQL, entity.getGia(), entity.getTenSP(), entity.getSoLuong(), entity.getSize(), entity.getMaSP(), entity.getMaHD(), entity.getMaCT());
     }
 
     @Override
@@ -72,5 +74,6 @@ public class HoaDonCTDao extends RavenDao<HoaDonCT, Integer>{
         }
         return list;
     }
-    
+
+
 }
