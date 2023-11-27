@@ -20,6 +20,7 @@ public class KhachHangDao extends RavenDao<KhachHang, Integer>{
     final String DELETE_SQL = "DELETE FROM KHACHHANG WHERE MAKH = ?";
     final String SELECT_ALL_SQL = "SELECT * FROM KHACHHANG";
     final String SELECT_BY_ID_SQL = "SELECT * FROM KHACHHANG WHERE MAKH = ?";
+    final String SELECT_KH_MOI = "SELECT MAKH, TENKH, SODT, DIACHI FROM KHACHHANG GROUP BY MAKH, TENKH, SODT, DIACHI HAVING MAKH = (SELECT TOP 1 MAKH FROM KHACHHANG ORDER BY MAKH DESC)";
 
     @Override
     public void insert(KhachHang entity) {
@@ -44,6 +45,14 @@ public class KhachHangDao extends RavenDao<KhachHang, Integer>{
     @Override
     public KhachHang selectByid(Integer id) {
         List<KhachHang> list = selectBysql(SELECT_BY_ID_SQL, id);
+        if (list.isEmpty()) {
+            return null;
+        }
+        return list.get(0);
+    }
+    
+     public KhachHang selectKHMoi() {
+        List<KhachHang> list = selectBysql(SELECT_KH_MOI);
         if (list.isEmpty()) {
             return null;
         }
