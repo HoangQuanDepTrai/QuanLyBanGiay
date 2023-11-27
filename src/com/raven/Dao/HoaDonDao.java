@@ -6,9 +6,8 @@ package com.raven.Dao;
 
 import com.raven.Entity.HoaDon;
 import com.raven.uitils.JdbcHelper;
-import java.sql.*;
+import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -19,11 +18,13 @@ public class HoaDonDao extends RavenDao<HoaDon, Integer> {
 
     final String INSERT_SQL = "INSERT INTO HOADON (HINHTHUC, PHIGIAO, THANHTIEN, TIENKHACHTRA, NGAYTAO, GIOTAO, MAKH, "
             + "MATRANGTHAI, MANV) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    final String UPDATE_SQL = "UPDATE HOADON HINHTHUC = ?, PHIGIAO = ?, THANHTIEN = ?, TIENKHACHTRA = ?, NGAYTAO = ?, "
+    final String UPDATE_SQL = "UPDATE HOADON SET HINHTHUC = ?, PHIGIAO = ?, THANHTIEN = ?, TIENKHACHTRA = ?, NGAYTAO = ?, "
             + "GIOTAO = ?, MAKH = ?, MATRANGTHAI = ?, MANV = ? WHERE MAHD = ?";
     final String DELETE_SQL = "DELETE FROM HOADON WHERE MAHD = ?";
     final String SELECT_ALL_SQL = "SELECT * FROM HOADON";
     final String SELECT_BY_ID_SQL = "SELECT * FROM HOADON WHERE MAHD = ?";
+    final String SELECT_DONMOI = "SELECT TOP 1 * FROM HOADON ORDER BY MAHD DESC";
+    final String SELECT_BY_TRANGTHAI = "SELECT * FROM HOADON WHERE MATRANGTHAI LIKE ?";
 
     @Override
     public void insert(HoaDon entity) {
@@ -47,6 +48,18 @@ public class HoaDonDao extends RavenDao<HoaDon, Integer> {
     @Override
     public List<HoaDon> selectAll() {
         return selectBysql(SELECT_ALL_SQL);
+    }
+
+    public List<HoaDon> selectByTrangThai(int tt) {
+        return selectBysql(SELECT_BY_TRANGTHAI, tt);
+    }
+
+    public HoaDon selectHDMoi() {
+        List<HoaDon> list = selectBysql(SELECT_DONMOI);
+        if (list.isEmpty()) {
+            return null;
+        }
+        return list.get(0);
     }
 
     @Override
@@ -83,26 +96,5 @@ public class HoaDonDao extends RavenDao<HoaDon, Integer> {
         }
         return list;
     }
-
-    public List<HoaDon> selectByTKNgay(String maTT, Date ngayTao) {
-        List<HoaDon> list = new ArrayList<>();
-        String SELECT_HD_TK = "SELECT MAHD,KHACHHANG.TENKH AS TENKH,\n"
-                + "NHANVIEN.TENNV AS TENNV,THANHTIEN FROM HOADON\n"
-                + "INNER JOIN KHACHHANG ON KHACHHANG.MAKH = HOADON.MAKH\n"
-                + "INNER JOIN NHANVIEN ON NHANVIEN.MANV = HOADON.MANV\n"
-                + "WHERE MATRANGTHAI = (SELECT MATRANGTHAI FROM TRANGTHAI WHERE TENTRANGTHAI LIKE ?) AND NGAYTAO = ?";
-        try {
-            ResultSet rs = JdbcHelper.query(SELECT_HD_TK, maTT, ngayTao);
-            while (rs.next()) {
-                HoaDon entity = new HoaDon(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getDouble(4));
-                list.add(entity);
-            }
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return list;
-    }
-    
 
 }

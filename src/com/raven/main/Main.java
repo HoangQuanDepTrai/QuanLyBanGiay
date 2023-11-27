@@ -4,8 +4,10 @@
  */
 package com.raven.main;
 
+import com.raven.Entity.KhachHang;
 import com.raven.Form.DangNhap;
 import com.raven.Form.DoiMatKhau;
+import com.raven.Form.GiaoHangJDialog;
 import com.raven.Form.NhanVien;
 import com.raven.Form.QuanLyGiaoDich;
 import com.raven.Form.SanPham;
@@ -34,7 +36,7 @@ public class Main extends javax.swing.JFrame {
         initComponents();
         setBackground(new Color(0, 0, 0, 0));
         menu.iniMoving(this);
-        showDangNhap();
+//        showDangNhap();
         menu.addEventMenuSelected(new EventMenuSelected() {
             @Override
             public void selected(int index) {
@@ -66,12 +68,15 @@ public class Main extends javax.swing.JFrame {
     private void ketThuc(){
         this.dispose();
     }
-    public void showDangNhap() {
-        DangNhap dangNhap = new DangNhap(this, true);
-        dangNhap.setVisible(true);
+    private void showDangNhap() {
+        new DangNhap(this, true).setVisible(true);
     }
     private void showDoiMatKhau() {
         new DoiMatKhau(this, true).setVisible(true);
+    }
+    
+    public void  showGiaoHang() {
+        new GiaoHangJDialog(this, true).setVisible(true);
     }
 
 
@@ -97,6 +102,11 @@ public class Main extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
+            }
+        });
 
         jPanelBorder1.setBackground(new java.awt.Color(51, 51, 51));
 
@@ -136,6 +146,10 @@ public class Main extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        showDangNhap();
+    }//GEN-LAST:event_formWindowOpened
+
     /**
      * @param args the command line arguments
      */
@@ -161,6 +175,7 @@ public class Main extends javax.swing.JFrame {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
