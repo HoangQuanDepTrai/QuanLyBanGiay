@@ -34,10 +34,8 @@ import javax.swing.table.DefaultTableModel;
  * @author ADMIN
  */
 public class ThongKe extends javax.swing.JPanel {
-
     TrangThaiDao ttDao = new TrangThaiDao();
     ThongKeDao tkDao = new ThongKeDao();
-    HoaDonCTDao hdctDao = new HoaDonCTDao();
 
     /**
      * Creates new form ThongKe
@@ -47,13 +45,12 @@ public class ThongKe extends javax.swing.JPanel {
         fillComBoBoxTT(cboTTNgay);
         fillComBoBoxTT(cboTTThang);
         fillComBoBoxTT(cboTTNam);
-        clickTTNgayDate();
-        clickTTThangNam();
+        mouseclick();
         dcTKThang.setMonth(0);
     }
 
-    private void clickTTNgayDate() {
-        Timer timer = new Timer(10000, new ActionListener() {
+    private void mouseclick() {
+        Timer timer = new Timer(1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dcNgay.addPropertyChangeListener(new PropertyChangeListener() {
@@ -83,25 +80,20 @@ public class ThongKe extends javax.swing.JPanel {
                         }
                     }
                 });
-
+                ycTKNam.addPropertyChangeListener("year", new PropertyChangeListener() {
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        if ("year".equals(evt.getPropertyName())) {
+                            fillThongKeNam();
+                            fillTableThongKeNam();
+                        }
+                    }
+                });
             }
         });
         timer.start();
     }
 
- 
-
-    private void clickTTThangNam() {
-        ycTKThang.addPropertyChangeListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if ("date".equals(evt.getPropertyName())) {
-                    fillThongKeThang();
-                    fillTableThongKeThang();
-                }
-            }
-        });
-    }
 
     private void fillComBoBoxTT(JComboBox cbotrangThai) {
         DefaultComboBoxModel model = (DefaultComboBoxModel) cbotrangThai.getModel();
@@ -125,7 +117,7 @@ public class ThongKe extends javax.swing.JPanel {
         }
     }
 
-    private void fillThongKeNgay() {
+    privat.e void fillThongKeNgay() {
         List<Object[]> list = tkDao.getTK_DT_NGAY(dcNgay.getDate(), cboTTNgay.getSelectedItem().toString());
         if (!list.isEmpty()) {
             Object[] data = list.get(0);
@@ -135,6 +127,18 @@ public class ThongKe extends javax.swing.JPanel {
             lblHoaDonNhoNgay.setText(String.valueOf(data[3] != null ? String.valueOf(data[3]) : "0"));
             lblHoaDonLonNgay.setText(String.valueOf(data[4] != null ? String.valueOf(data[4]) : "0"));
             lblHoaDonTBNgay.setText(String.valueOf(data[5] != null ? String.valueOf(data[5]) : "0"));
+        }
+    }
+    private void fillThongKeNam() {
+        List<Object[]> list = tkDao.getTK_DT_NAM(ycTKNam.getYear(), cboTTNam.getSelectedItem().toString());
+        if (!list.isEmpty()) {
+            Object[] data = list.get(0);
+            lblTongDTNam.setText(String.valueOf(data[0] != null ? String.valueOf(data[0]) : "0"));
+            lblSLGiayNam.setText(String.valueOf(data[1] != null ? String.valueOf(data[1]) : "0"));
+            lblSLHDNam.setText(String.valueOf(data[2]));
+            lblHDNNNam.setText(String.valueOf(data[3] != null ? String.valueOf(data[3]) : "0"));
+            lblHDLNNam.setText(String.valueOf(data[4] != null ? String.valueOf(data[4]) : "0"));
+            lblHDTBNam.setText(String.valueOf(data[5] != null ? String.valueOf(data[5]) : "0"));
         }
     }
 
@@ -156,6 +160,20 @@ public class ThongKe extends javax.swing.JPanel {
         DefaultTableModel model = (DefaultTableModel) tblDTThang.getModel();
         model.setRowCount(0);
         List<Object[]> list = tkDao.getTK_DT_TABLETHANG(dcTKThang.getMonth() + 1, ycTKThang.getYear(), cboTTThang.getSelectedItem().toString());
+        for (Object[] row : list) {
+            model.addRow(new Object[]{
+                row[0],
+                row[1],
+                row[2],
+                row[3]
+            });
+        }
+    }
+    
+    private void fillTableThongKeNam() {
+        DefaultTableModel model = (DefaultTableModel) tblDTNam.getModel();
+        model.setRowCount(0);
+        List<Object[]> list = tkDao.getTK_DT_TABLENAM(ycTKNam.getYear(), cboTTNam.getSelectedItem().toString());
         for (Object[] row : list) {
             model.addRow(new Object[]{
                 row[0],
@@ -766,7 +784,13 @@ public class ThongKe extends javax.swing.JPanel {
     }//GEN-LAST:event_cboTTThangActionPerformed
 
     private void cboTTNamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboTTNamActionPerformed
-        // TODO add your handling code here:
+        cboTTNam.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                fillThongKeNam();
+                fillTableThongKeNam();
+            }
+        });
     }//GEN-LAST:event_cboTTNamActionPerformed
 
 
