@@ -128,7 +128,6 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         hd.setMaKH(getMaKH());
         hDDao.insert(hd);
         txtMaHD.setText(hDDao.selectHDMoi().getMaHD() + "");
-        System.out.println(hd.toString());
     }
 
     private String getTrangThai(int soLuong) {
@@ -188,7 +187,6 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         model.setRowCount(0);
         try {
             List<HoaDon> listHD = hDDao.selectByTrangThai(tt.getMaTrangThai());
-            System.out.println(tt.getMaTrangThai());
             for (HoaDon hd : listHD) {
                 KhachHang kh = khDao.selectByid(hd.getMaKH());
                 QLNhanVien nv = nvDao.selectByid(hd.getMaNV());
@@ -360,6 +358,22 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
             pm.add(mniHoanThanh);
             pm.add(mniHoanTra);
             pm.show(tblHD, evt.getX(), evt.getY());
+    }
+    
+    boolean ktMaHD() {
+        if (txtMaHD.getText().isEmpty()) {
+            MsgBox.alert(this, "Chưa tạo hóa đơn");
+            return false;
+        }
+        return true;
+    }
+    
+    void them() {
+        if (ktMaHD()) {
+            this.row = tblGiaoDichSanPham.getSelectedRow();
+            edit();
+            txtThanhTien.setText(getThanhTien() + "");
+        }
     }
 
     /**
@@ -842,6 +856,11 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         jButton1.setForeground(new java.awt.Color(51, 51, 51));
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/raven/Icon/Add.png"))); // NOI18N
         jButton1.setText("Thêm");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -1000,6 +1019,10 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
             hienPM(evt);
         }
     }//GEN-LAST:event_tblHDMouseClicked
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        them();
+    }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
