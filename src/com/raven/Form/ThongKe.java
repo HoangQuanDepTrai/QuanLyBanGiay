@@ -117,7 +117,7 @@ public class ThongKe extends javax.swing.JPanel {
         }
     }
 
-    privat.e void fillThongKeNgay() {
+    private void fillThongKeNgay() {
         List<Object[]> list = tkDao.getTK_DT_NGAY(dcNgay.getDate(), cboTTNgay.getSelectedItem().toString());
         if (!list.isEmpty()) {
             Object[] data = list.get(0);
