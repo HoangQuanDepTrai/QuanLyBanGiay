@@ -6,6 +6,7 @@ package com.raven.Form;
 
 import com.raven.Dao.KhachHangDao;
 import com.raven.Entity.KhachHang;
+import com.raven.uitils.MsgBox;
 
 /**
  *
@@ -21,16 +22,50 @@ public class GiaoHangJDialog extends javax.swing.JDialog {
         initComponents();
         init();
     }
-    
-    void init(){
+
+    void init() {
         this.setLocationRelativeTo(null);
     }
+
+    void taoKH() {
+        if (ktForm()) {
+            if (ktTenKH(txtTen.getText())) {
+                KhachHang kh = new KhachHang(WIDTH, txtTen.getText(), txtSoDT.getText(), txtDiaChi.getText());
+                KhachHangDao khDao = new KhachHangDao();
+                khDao.insert(kh);
+                this.setVisible(false);
+            }
+        }
+    }
+
+    boolean ktTenKH(String ten) {
+        String dinhDangTen = "^[A-Za-z?]+$";
+        if (dinhDangTen.matches(ten)) {
+            MsgBox.alert(this, "Tên không đúng định dạng");
+            return false;
+        }
+        return true;
+    }
     
-    void taoKH(){
-        KhachHang kh = new KhachHang(WIDTH, txtTen.getText(), txtSoDT.getText(), txtDiaChi.getText());
-        KhachHangDao khDao = new KhachHangDao();
-        khDao.insert(kh);
-        this.setVisible(false);
+    boolean ktSDT(String sdt) {
+        String dinhDangTen = "^0[0-9]{9}$";
+        if (dinhDangTen.matches(sdt)) {
+            MsgBox.alert(this, "Số điện thoại không đúng định dạng");
+            return false;
+        }
+        return true;
+    }
+
+    boolean ktForm() {
+        if (txtTen.getText().isEmpty() || txtSoDT.getText().isEmpty() || txtDiaChi.getText().isEmpty()) {
+            MsgBox.alert(this, "Không được bỏ trống");
+            return false;
+        }
+        if (ktTenKH(txtTen.getText())) {
+            return false;
+        }
+        
+        return true;
     }
 
     /**
@@ -55,6 +90,7 @@ public class GiaoHangJDialog extends javax.swing.JDialog {
         txtTen = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setUndecorated(true);
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel2.setText("Tên khách hàng ");
