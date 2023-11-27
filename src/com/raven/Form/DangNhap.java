@@ -22,6 +22,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.Ellipse2D;
+import java.time.Clock;
 import javax.swing.*;
 import javax.swing.JPanel;
 
@@ -72,7 +73,9 @@ public class DangNhap extends javax.swing.JDialog {
     NhanVienDao dao = new NhanVienDao();
 
     public void ketThuc() {
-        this.dispose();
+        if (MsgBox.confirm(this, "Bạn muốn thoát ứng dụng không??")) {
+            System.exit(0);
+        }
     }
 
     void dangNhap() {
@@ -263,7 +266,7 @@ public class DangNhap extends javax.swing.JDialog {
     }//GEN-LAST:event_lblDNMouseClicked
 
     private void btnThoatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThoatActionPerformed
-        this.setVisible(false);
+        ketThuc();
     }//GEN-LAST:event_btnThoatActionPerformed
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
