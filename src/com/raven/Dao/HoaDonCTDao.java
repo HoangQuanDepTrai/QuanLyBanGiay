@@ -20,7 +20,10 @@ public class HoaDonCTDao extends RavenDao<HoaDonCT, Integer>{
     final String DELETE_SQL = "DELETE FROM HOADONCT WHERE MACT = ?";
     final String SELECT_ALL_SQL = "SELECT * FROM HOADONCT";
     final String SELECT_BY_ID_SQL = "SELECT * FROM HOADONCT WHERE MACT = ?";
+    final String SELECT_DONCTMOI = "SELECT TOP 1 * FROM HOADONCT ORDER BY MACT DESC";
+    final String SELECT_BY_MAHD = "SELECT * FROM HOADONCT WHERE MAHD LIKE ?";
 
+    
     @Override
     public void insert(HoaDonCT entity) {
         JdbcHelper.update(INSERT_SQL, entity.getGia(),entity.getTenSP(),entity.getSoLuong(),entity.getSize(),entity.getMaSP(),entity.getMaHD());
@@ -40,10 +43,22 @@ public class HoaDonCTDao extends RavenDao<HoaDonCT, Integer>{
     public List<HoaDonCT> selectAll() {
         return selectBysql(SELECT_ALL_SQL);
     }
+    
+    public List<HoaDonCT> selectByMaHD(int MaHD) {
+        return selectBysql(SELECT_BY_MAHD,MaHD);
+    }
 
     @Override
     public HoaDonCT selectByid(Integer id) {
         List<HoaDonCT> list = selectBysql(SELECT_BY_ID_SQL, id);
+        if (list.isEmpty()) {
+            return null;
+        }
+        return list.get(0);
+    }
+    
+    public HoaDonCT selectHDCTMoi() {
+        List<HoaDonCT> list = selectBysql(SELECT_DONCTMOI);
         if (list.isEmpty()) {
             return null;
         }

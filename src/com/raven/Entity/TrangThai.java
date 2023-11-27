@@ -35,5 +35,11 @@ public class TrangThai {
     public void setTenTrangThai(String tenTrangThai) {
         this.tenTrangThai = tenTrangThai;
     }
+
+    @Override
+    public String toString() {
+        return tenTrangThai;
+    }
+    
     
 }

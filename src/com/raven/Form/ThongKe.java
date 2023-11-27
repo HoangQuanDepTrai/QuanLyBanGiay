@@ -4,13 +4,18 @@
  */
 package com.raven.Form;
 
+import com.raven.Dao.HoaDonCTDao;
 import com.raven.Dao.HoaDonDao;
 import com.raven.Dao.ThongKeDao;
 import com.raven.Dao.TrangThaiDao;
 import com.raven.Entity.HoaDon;
+import com.raven.Entity.HoaDonCT;
 import com.raven.Entity.TrangThai;
 import com.raven.uitils.MsgBox;
 import com.raven.uitils.XDate;
+import com.toedter.calendar.JMonthChooser;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
@@ -20,6 +25,7 @@ import java.util.Date;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.Timer;
 import javax.swing.event.AncestorListener;
 import javax.swing.table.DefaultTableModel;
 
@@ -31,6 +37,7 @@ public class ThongKe extends javax.swing.JPanel {
 
     TrangThaiDao ttDao = new TrangThaiDao();
     ThongKeDao tkDao = new ThongKeDao();
+    HoaDonCTDao hdctDao = new HoaDonCTDao();
 
     /**
      * Creates new form ThongKe
@@ -41,32 +48,48 @@ public class ThongKe extends javax.swing.JPanel {
         fillComBoBoxTT(cboTTThang);
         fillComBoBoxTT(cboTTNam);
         clickTTNgayDate();
-        clickTTThang();
         clickTTThangNam();
+        dcTKThang.setMonth(0);
     }
 
     private void clickTTNgayDate() {
-        dcNgay.addPropertyChangeListener(new PropertyChangeListener() {
+        Timer timer = new Timer(10000, new ActionListener() {
             @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if ("date".equals(evt.getPropertyName())) {
-                    fillThongKeNgay();
-                    fillTableThongKeNgay();
-                }
+            public void actionPerformed(ActionEvent e) {
+                dcNgay.addPropertyChangeListener(new PropertyChangeListener() {
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        if ("date".equals(evt.getPropertyName())) {
+                            fillThongKeNgay();
+                            fillTableThongKeNgay();
+                        }
+                    }
+                });
+                dcTKThang.addPropertyChangeListener("month", new PropertyChangeListener() {
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        if ("month".equals(evt.getPropertyName())) {
+                            fillTableThongKeThang();
+                            fillThongKeThang();
+                        }
+                    }
+                });
+                ycTKThang.addPropertyChangeListener("year", new PropertyChangeListener() {
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        if ("year".equals(evt.getPropertyName())) {
+                            fillTableThongKeThang();
+                            fillThongKeThang();
+                        }
+                    }
+                });
+
             }
         });
+        timer.start();
     }
 
-    private void clickTTThang() {
-        dcTKThang.addPropertyChangeListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if ("date".equals(evt.getPropertyName())) {
-                    fillThongKeThang();
-                }
-            }
-        });
-    }
+ 
 
     private void clickTTThangNam() {
         ycTKThang.addPropertyChangeListener(new PropertyChangeListener() {
@@ -74,6 +97,7 @@ public class ThongKe extends javax.swing.JPanel {
             public void propertyChange(PropertyChangeEvent evt) {
                 if ("date".equals(evt.getPropertyName())) {
                     fillThongKeThang();
+                    fillTableThongKeThang();
                 }
             }
         });
@@ -118,6 +142,20 @@ public class ThongKe extends javax.swing.JPanel {
         DefaultTableModel model = (DefaultTableModel) tblDTNgay.getModel();
         model.setRowCount(0);
         List<Object[]> list = tkDao.getTK_DT_TABLENGAY(dcNgay.getDate(), cboTTNgay.getSelectedItem().toString());
+        for (Object[] row : list) {
+            model.addRow(new Object[]{
+                row[0],
+                row[1],
+                row[2],
+                row[3]
+            });
+        }
+    }
+
+    private void fillTableThongKeThang() {
+        DefaultTableModel model = (DefaultTableModel) tblDTThang.getModel();
+        model.setRowCount(0);
+        List<Object[]> list = tkDao.getTK_DT_TABLETHANG(dcTKThang.getMonth() + 1, ycTKThang.getYear(), cboTTThang.getSelectedItem().toString());
         for (Object[] row : list) {
             model.addRow(new Object[]{
                 row[0],
@@ -441,6 +479,7 @@ public class ThongKe extends javax.swing.JPanel {
         jLabel27.setForeground(new java.awt.Color(255, 255, 255));
         jLabel27.setText("Hóa đơn trung bình");
 
+        dcTKThang.setNextFocusableComponent(cboTTThang);
         dcTKThang.setYearChooser(ycTKThang);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -711,6 +750,7 @@ public class ThongKe extends javax.swing.JPanel {
             public void itemStateChanged(ItemEvent e) {
                 fillThongKeNgay();
                 fillTableThongKeNgay();
+
             }
         });
     }//GEN-LAST:event_cboTTNgayActionPerformed
@@ -720,6 +760,7 @@ public class ThongKe extends javax.swing.JPanel {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 fillThongKeThang();
+                fillTableThongKeThang();
             }
         });
     }//GEN-LAST:event_cboTTThangActionPerformed

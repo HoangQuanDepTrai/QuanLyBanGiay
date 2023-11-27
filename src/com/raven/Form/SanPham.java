@@ -43,6 +43,7 @@ public class SanPham extends javax.swing.JPanel {
         fillComboboxLoai();
         fillComboboxMau();
         fillComboboxSize();
+
     }
 
     private void hienThiHinhAnh(String fileName) {
@@ -111,12 +112,13 @@ public class SanPham extends javax.swing.JPanel {
         try {
             List<QLSanPham> list = spDao.selectAll();
             for (QLSanPham qLSP : list) {
+                Loai loai = new LoaiDao().selectByid(qLSP.getLoai());
                 Object[] row = {
                     qLSP.getMaSP(),
                     qLSP.getTenSp(),
                     qLSP.getGiaBan(),
                     qLSP.getSoLuong(),
-                    qLSP.getLoai(),
+                    loai.getTenLoai(),
                     qLSP.getSize(),
                     qLSP.getMau(),
                     qLSP.getHinhAnh(),
@@ -174,8 +176,9 @@ public class SanPham extends javax.swing.JPanel {
     private void edit() {
         try {
             String maSP = (String) tblSanPham.getValueAt(row, 0);
-            String tenLoai = (String) tblSanPham.getValueAt(row, 4);
-            QLSanPham sp = spDao.selectByidTenLoai(tenLoai, maSP);
+            String loai = tblSanPham.getValueAt(row, 4).toString();
+            QLSanPham sp = spDao.selectByid(maSP);
+            sp.setLoai(loai);
             if (sp != null) {
                 setForm(sp);
                 tbs.setSelectedIndex(0);
@@ -651,9 +654,6 @@ public class SanPham extends javax.swing.JPanel {
             }
         ));
         tblSanPham.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tblSanPhamMouseClicked(evt);
-            }
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 tblSanPhamMousePressed(evt);
             }
@@ -779,10 +779,6 @@ public class SanPham extends javax.swing.JPanel {
     private void cboMauActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboMauActionPerformed
 
     }//GEN-LAST:event_cboMauActionPerformed
-
-    private void tblSanPhamMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblSanPhamMouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tblSanPhamMouseClicked
 
     private void btnFirstActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFirstActionPerformed
         first();
