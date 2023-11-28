@@ -40,20 +40,22 @@ public class GiaoHangJDialog extends javax.swing.JDialog {
 
     boolean ktTenKH(String ten) {
         String dinhDangTen = "^[A-Za-z ]+$";
-        if (ten.matches(dinhDangTen)) {
-            MsgBox.alert(this, "Tên không đúng định dạng");
-            return false;
-        }
-        return true;
+        return !ten.matches(dinhDangTen);
+//        if (!ten.matches(dinhDangTen)) {
+//            MsgBox.alert(this, "Tên không đúng định dạng");
+//            return false;
+//        }
+//        return true;
     }
 
     boolean ktSDT(String sdt) {
         String dinhDangSDT = "^0[0-9]{9}$";
-        if (!sdt.matches(dinhDangSDT)) {
-            MsgBox.alert(this, "Số điện thoại không đúng định dạng");
-            return false;
-        }
-        return true;
+        return !sdt.matches(dinhDangSDT);
+//        if (!sdt.matches(dinhDangSDT)) {
+//            MsgBox.alert(this, "Số điện thoại không đúng định dạng");
+//            return false;
+//        }
+//        return true;
     }
 
     boolean ktForm() {
@@ -62,13 +64,13 @@ public class GiaoHangJDialog extends javax.swing.JDialog {
             return false;
         }
         if (ktTenKH(txtTen.getText())) {
+             MsgBox.alert(this, "Tên không đúng đinh dạng ");
             return false;
         }
-        
         if (ktSDT(txtSoDT.getText())) {
+            MsgBox.alert(this, "Số điện thoại không đúng đinh dạng ");
             return false;
         }
-
         return true;
     }
 
