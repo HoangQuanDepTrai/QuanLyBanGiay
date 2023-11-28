@@ -6,6 +6,7 @@ package com.raven.Form;
 
 import com.raven.Dao.KhachHangDao;
 import com.raven.Entity.KhachHang;
+import com.raven.uitils.KhachHangGiaoHang;
 import com.raven.uitils.MsgBox;
 
 /**
@@ -29,27 +30,26 @@ public class GiaoHangJDialog extends javax.swing.JDialog {
 
     void taoKH() {
         if (ktForm()) {
-            if (ktTenKH(txtTen.getText())) {
-                KhachHang kh = new KhachHang(WIDTH, txtTen.getText(), txtSoDT.getText(), txtDiaChi.getText());
-                KhachHangDao khDao = new KhachHangDao();
-                khDao.insert(kh);
-                this.setVisible(false);
-            }
+            KhachHang kh = new KhachHang(WIDTH, txtTen.getText(), txtSoDT.getText(), txtDiaChi.getText());
+            KhachHangDao khDao = new KhachHangDao();
+            khDao.insert(kh);
+            KhachHangGiaoHang.khachHang = kh;
+            this.setVisible(false);
         }
     }
 
     boolean ktTenKH(String ten) {
-        String dinhDangTen = "^[A-Za-z?]+$";
-        if (dinhDangTen.matches(ten)) {
+        String dinhDangTen = "^[A-Za-z ]+$";
+        if (ten.matches(dinhDangTen)) {
             MsgBox.alert(this, "Tên không đúng định dạng");
             return false;
         }
         return true;
     }
-    
+
     boolean ktSDT(String sdt) {
-        String dinhDangTen = "^0[0-9]{9}$";
-        if (dinhDangTen.matches(sdt)) {
+        String dinhDangSDT = "^0[0-9]{9}$";
+        if (!sdt.matches(dinhDangSDT)) {
             MsgBox.alert(this, "Số điện thoại không đúng định dạng");
             return false;
         }
@@ -65,6 +65,10 @@ public class GiaoHangJDialog extends javax.swing.JDialog {
             return false;
         }
         
+        if (ktSDT(txtSoDT.getText())) {
+            return false;
+        }
+
         return true;
     }
 
@@ -113,6 +117,11 @@ public class GiaoHangJDialog extends javax.swing.JDialog {
         btnOK.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/raven/Icon/Tick.png"))); // NOI18N
         btnOK.setText("OK");
         btnOK.setBorder(null);
+        btnOK.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnOKMouseClicked(evt);
+            }
+        });
         btnOK.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnOKActionPerformed(evt);
@@ -206,6 +215,10 @@ public class GiaoHangJDialog extends javax.swing.JDialog {
     private void btnThoatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThoatActionPerformed
         this.setVisible(false);
     }//GEN-LAST:event_btnThoatActionPerformed
+
+    private void btnOKMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnOKMouseClicked
+        
+    }//GEN-LAST:event_btnOKMouseClicked
 
     /**
      * @param args the command line arguments
