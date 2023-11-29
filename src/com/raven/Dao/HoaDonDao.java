@@ -16,6 +16,11 @@ import java.util.List;
  */
 public class HoaDonDao extends RavenDao<HoaDon, Integer> {
 
+    public List<HoaDon> selectByKeyword(String keyword) {
+        String SQL = "select * from Hoadon where mahd like ?";
+        return this.selectBysql(SQL, "%" + keyword + "%");
+    }
+
     final String INSERT_SQL = "INSERT INTO HOADON (HINHTHUC, PHIGIAO, THANHTIEN, TIENKHACHTRA, NGAYTAO, GIOTAO, MAKH, "
             + "MATRANGTHAI, MANV) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     final String UPDATE_SQL = "UPDATE HOADON SET HINHTHUC = ?, PHIGIAO = ?, THANHTIEN = ?, TIENKHACHTRA = ?, NGAYTAO = ?, "
@@ -25,6 +30,7 @@ public class HoaDonDao extends RavenDao<HoaDon, Integer> {
     final String SELECT_BY_ID_SQL = "SELECT * FROM HOADON WHERE MAHD = ?";
     final String SELECT_DONMOI = "SELECT TOP 1 * FROM HOADON ORDER BY MAHD DESC";
     final String SELECT_BY_TRANGTHAI = "SELECT * FROM HOADON WHERE MATRANGTHAI LIKE ?";
+    final String SELECT_NOT_IN_COURSE_SQL = "SELECT * FROM HOADON WHERE TENNV LIKE ?";
 
     @Override
     public void insert(HoaDon entity) {
