@@ -59,4 +59,9 @@ public class ThongKeDao {
         String col[] = {"TONGDOANHTHU","SOLUONGGIAY","SOLUONGHOADON","HOADONNHONHAT","HOADONLONNHAT","HOADONTRUNGBING"};
         return getListOfArray(sql, col, nam,trangThai);
     }
+    public List<Object[]> getTK_DT_TABLENAM(Integer nam,String trangThai){
+        String sql = "{CALL TK_DT_TABLENAM(?,?)}";
+        String col[] = {"MAHD","TENKH","TENNV","THANHTIEN"};
+        return getListOfArray(sql, col, nam,trangThai);
+    }
 }
