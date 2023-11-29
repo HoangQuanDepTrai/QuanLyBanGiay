@@ -82,18 +82,23 @@ public class SanPham extends javax.swing.JPanel {
         }
     }
 
-    private boolean ktra() {
-        if (txtTenSP.getText().isEmpty() || txtMaSP.getText().isEmpty() || txtSoLuong.getText().isEmpty() || txtGia.getText().isEmpty() || txtGiaNhap.getText().isEmpty()) {
-            MsgBox.alert(this, "Không được bỏ trống");
-            return false;
-        }
-          List<QLSanPham> sp = spDao.selectAll();
+    private boolean ktrama() {
+        List<QLSanPham> sp = spDao.selectAll();
         for (QLSanPham qLSanPham : sp) {
             if (qLSanPham.getMaSP().equals(txtMaSP.getText())) {
                 MsgBox.alert(this, "Mã đã tồn tại");
                 return false;
             }
         }
+        return true;
+    }
+
+    private boolean ktra() {
+        if (txtTenSP.getText().isEmpty() || txtMaSP.getText().isEmpty() || txtSoLuong.getText().isEmpty() || txtGia.getText().isEmpty() || txtGiaNhap.getText().isEmpty()) {
+            MsgBox.alert(this, "Không được bỏ trống");
+            return false;
+        }
+
         try {
             Integer.parseInt(txtSoLuong.getText());
         } catch (Exception e) {
@@ -116,7 +121,7 @@ public class SanPham extends javax.swing.JPanel {
             MsgBox.alert(this, "Không được bỏ trống hình");
             return false;
         }
-      
+
         return true;
     }
 
@@ -247,7 +252,7 @@ public class SanPham extends javax.swing.JPanel {
     }
 
     void insert() {
-        if (ktra()) {
+        if (ktra() && ktrama()) {
             try {
                 QLSanPham sp = getForm();
                 sp.setLoai(cboLoai.getSelectedItem() + "");
