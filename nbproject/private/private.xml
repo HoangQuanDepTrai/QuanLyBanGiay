@@ -3,6 +3,7 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+<<<<<<< HEAD
             <file>file:/D:/FPT%20Polytechnic/Ky_4/BLOCK_2/DuAn_1/SHOPGIAYBCCDM/src/com/raven/Form/SanPham.java</file>
             <file>file:/D:/FPT%20Polytechnic/Ky_4/BLOCK_2/DuAn_1/SHOPGIAYBCCDM/src/com/raven/Form/TraHang.java</file>
             <file>file:/D:/FPT%20Polytechnic/Ky_4/BLOCK_2/DuAn_1/SHOPGIAYBCCDM/src/com/raven/Form/GiaoHangJDialog.java</file>
@@ -18,6 +19,19 @@
             <file>file:/D:/FPT%20Polytechnic/Ky_4/BLOCK_2/DuAn_1/SHOPGIAYBCCDM/src/com/raven/Form/ThongKe.java</file>
             <file>file:/D:/FPT%20Polytechnic/Ky_4/BLOCK_2/DuAn_1/SHOPGIAYBCCDM/src/com/raven/Form/DangNhap.java</file>
             <file>file:/D:/FPT%20Polytechnic/Ky_4/BLOCK_2/DuAn_1/SHOPGIAYBCCDM/src/com/raven/Entity/KhachHang.java</file>
+=======
+<<<<<<< HEAD
+            <file>file:/D:/ShopBanGiayBCCDM/SHOPGIAYBCCDM/src/com/raven/Dao/NhanVienDao.java</file>
+            <file>file:/D:/ShopBanGiayBCCDM/SHOPGIAYBCCDM/src/com/raven/Dao/KhachHangDao.java</file>
+            <file>file:/D:/ShopBanGiayBCCDM/SHOPGIAYBCCDM/src/com/raven/Entity/HoaDon.java</file>
+            <file>file:/D:/ShopBanGiayBCCDM/SHOPGIAYBCCDM/src/com/raven/Dao/HoaDonDao.java</file>
+            <file>file:/D:/ShopBanGiayBCCDM/SHOPGIAYBCCDM/src/com/raven/Form/TraHang.java</file>
+            <file>file:/D:/ShopBanGiayBCCDM/SHOPGIAYBCCDM/src/com/raven/Form/NhanVien.java</file>
+=======
+            <file>file:/D:/FPT/KI/KI4/BLOCK2/DU%20AN%201/Code2/SHOPGIAYBCCDM/src/com/raven/Form/GiaoHangJDialog.java</file>
+            <file>file:/D:/FPT/KI/KI4/BLOCK2/DU%20AN%201/Code2/SHOPGIAYBCCDM/src/com/raven/Form/QuanLyGiaoDich.java</file>
+>>>>>>> a653f40fe2f30c2e337d42603f3003971dba4597
+>>>>>>> f30a5b825c99f3a565c6f28aaf502df05a602b6c
         </group>
     </open-files>
 </project-private>

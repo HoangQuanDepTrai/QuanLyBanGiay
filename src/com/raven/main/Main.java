@@ -58,7 +58,7 @@ public class Main extends javax.swing.JFrame {
                 } else if (index == 9) {
                     setForm(new TraHang());
                 } else if (index == 10) {
-                    if (!Auth.isManager()) {
+                    if (Auth.isManager()) {
                         MsgBox.alert(jPanelBorder1, "Bạn không có quyền xem doanh thu");
                         return;
                     }

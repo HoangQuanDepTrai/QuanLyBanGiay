@@ -6,6 +6,13 @@ package com.raven.Form;
 
 import com.raven.Dao.KhachHangDao;
 import com.raven.Entity.KhachHang;
+import com.raven.uitils.KhachHangGiaoHang;
+import com.raven.uitils.MsgBox;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 
 /**
  *
@@ -21,16 +28,78 @@ public class GiaoHangJDialog extends javax.swing.JDialog {
         initComponents();
         init();
     }
-    
-    void init(){
+
+    void init() {
         this.setLocationRelativeTo(null);
+        iniMoving(this);
+    }
+
+    void taoKH() {
+        if (ktForm()) {
+            KhachHang kh = new KhachHang(WIDTH, txtTen.getText(), txtSoDT.getText(), txtDiaChi.getText());
+            KhachHangDao khDao = new KhachHangDao();
+            khDao.insert(kh);
+            kh = khDao.selectKHMoi();
+            KhachHangGiaoHang.khachHang = kh;
+            this.setVisible(false);
+        }
     }
     
-    void taoKH(){
-        KhachHang kh = new KhachHang(WIDTH, txtTen.getText(), txtSoDT.getText(), txtDiaChi.getText());
-        KhachHangDao khDao = new KhachHangDao();
-        khDao.insert(kh);
-        this.setVisible(false);
+    private int x;
+    private int y;
+//di chuyển Fame
+    public void iniMoving(JDialog dl) {
+        lblGiaoHang.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                x = e.getX();
+                y = e.getY();
+            }
+
+        });
+        lblGiaoHang.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                dl.setLocation(e.getXOnScreen() - x, e.getYOnScreen() - y);
+            }
+
+        });
+    }
+
+    boolean ktTenKH(String ten) {
+        String dinhDangTen = "^[A-Za-z ]+$";
+        return !ten.matches(dinhDangTen);
+//        if (!ten.matches(dinhDangTen)) {
+//            MsgBox.alert(this, "Tên không đúng định dạng");
+//            return false;
+//        }
+//        return true;
+    }
+
+    boolean ktSDT(String sdt) {
+        String dinhDangSDT = "^0[0-9]{9}$";
+        return !sdt.matches(dinhDangSDT);
+//        if (!sdt.matches(dinhDangSDT)) {
+//            MsgBox.alert(this, "Số điện thoại không đúng định dạng");
+//            return false;
+//        }
+//        return true;
+    }
+
+    boolean ktForm() {
+        if (txtTen.getText().isEmpty() || txtSoDT.getText().isEmpty() || txtDiaChi.getText().isEmpty()) {
+            MsgBox.alert(this, "Không được bỏ trống");
+            return false;
+        }
+        if (ktTenKH(txtTen.getText())) {
+             MsgBox.alert(this, "Tên không đúng đinh dạng ");
+            return false;
+        }
+        if (ktSDT(txtSoDT.getText())) {
+            MsgBox.alert(this, "Số điện thoại không đúng đinh dạng ");
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -45,7 +114,7 @@ public class GiaoHangJDialog extends javax.swing.JDialog {
         jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
+        lblGiaoHang = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         txtDiaChi = new javax.swing.JTextArea();
         jLabel7 = new javax.swing.JLabel();
@@ -55,6 +124,7 @@ public class GiaoHangJDialog extends javax.swing.JDialog {
         txtTen = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setUndecorated(true);
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel2.setText("Tên khách hàng ");
@@ -62,9 +132,9 @@ public class GiaoHangJDialog extends javax.swing.JDialog {
         jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel4.setText("Số điện thoại ");
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Giao hàng ");
+        lblGiaoHang.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        lblGiaoHang.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblGiaoHang.setText("Giao hàng ");
 
         txtDiaChi.setColumns(20);
         txtDiaChi.setRows(5);
@@ -77,6 +147,11 @@ public class GiaoHangJDialog extends javax.swing.JDialog {
         btnOK.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/raven/Icon/Tick.png"))); // NOI18N
         btnOK.setText("OK");
         btnOK.setBorder(null);
+        btnOK.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnOKMouseClicked(evt);
+            }
+        });
         btnOK.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnOKActionPerformed(evt);
@@ -101,7 +176,7 @@ public class GiaoHangJDialog extends javax.swing.JDialog {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(lblGiaoHang, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -127,7 +202,7 @@ public class GiaoHangJDialog extends javax.swing.JDialog {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
+                .addComponent(lblGiaoHang)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
@@ -168,8 +243,13 @@ public class GiaoHangJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_btnOKActionPerformed
 
     private void btnThoatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThoatActionPerformed
+        KhachHangGiaoHang.clear();
         this.setVisible(false);
     }//GEN-LAST:event_btnThoatActionPerformed
+
+    private void btnOKMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnOKMouseClicked
+        
+    }//GEN-LAST:event_btnOKMouseClicked
 
     /**
      * @param args the command line arguments
@@ -231,12 +311,12 @@ public class GiaoHangJDialog extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnOK;
     private javax.swing.JButton btnThoat;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblGiaoHang;
     private javax.swing.JTextArea txtDiaChi;
     private javax.swing.JTextField txtSoDT;
     private javax.swing.JTextField txtTen;

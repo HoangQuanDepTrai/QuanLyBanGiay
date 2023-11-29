@@ -20,6 +20,7 @@ import com.raven.Entity.QLSanPham;
 import com.raven.Entity.TrangThai;
 import com.raven.main.Main;
 import com.raven.uitils.Auth;
+import com.raven.uitils.KhachHangGiaoHang;
 import com.raven.uitils.MsgBox;
 import com.raven.uitils.XDate;
 import java.awt.Color;
@@ -49,6 +50,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
     NhanVienDao nvDao = new NhanVienDao();
     int row = -1;
     int rowHD = -1;
+
     public QuanLyGiaoDich() {
         initComponents();
         init();
@@ -62,7 +64,6 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
 
     void upDateHD(HoaDon hd) {
         hDDao.update(hd);
-        MsgBox.alert(this, "Thành công");
         lamMoi();
         fillTableHD();
     }
@@ -71,24 +72,31 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         if (ktHD()) {
             if (rdoGiaoHang.isSelected()) {
                 new Main().showGiaoHang();
-                upDateHD(getHoaDon());
+                if (KhachHangGiaoHang.khachHang.getMaKH() == 1) {
+                    MsgBox.alert(this, "Nhập thông tin khách giao hàng");
+                } else {
+                    HoaDon hd = getHoaDon();
+                    hd.setMaTT(1);
+                    upDateHD(hd);
+                    MsgBox.alert(this, "Thành công");
+                }
             } else {
                 HoaDon hd = getHoaDon();
                 hd.setMaTT(2);
                 upDateHD(hd);
+                MsgBox.alert(this, "Thành công gggggggggggggggg");
             }
         }
     }
 
-    int getMaKH() {
-        if (rdoTaiQuay.isSelected()) {
-            return 1;
-        } else {
-            KhachHang khMoi = khDao.selectKHMoi();
-            return khMoi.getMaKH();
-        }
-    }
-
+//    int getMaKH() {
+//        if (rdoTaiQuay.isSelected()) {
+//            return 1;
+//        } else {
+//            KhachHang khMoi = khDao.selectKHMoi();
+//            return khMoi.getMaKH();
+//        }
+//    }
     int getMaTT() {
         TrangThai tt = new TrangThai();
         tt = (TrangThai) cboTT.getSelectedItem();
@@ -105,7 +113,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         hd.setTienKhachTra(Double.parseDouble(txtTienKhachTra.getText()));
         hd.setNgayTao(dcNgayTao.getDate());
         hd.setGioTao(XDate.toDate(txtGioTao.getText(), "hh:MM:ss"));
-        hd.setMaKH(getMaKH());
+        hd.setMaKH(KhachHangGiaoHang.khachHang.getMaKH());
         hd.setMaTT(getMaTT());
         hd.setMaNV(Auth.user.getManv());
         return hd;
@@ -117,7 +125,6 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         dcNgayTao.setDate(ngayTao);
         txtMaNV.setText(Auth.user.getManv());
         txtGioTao.setText(sdf.format(ngayTao) + "");
-
         HoaDon hd = new HoaDon();
         hd.setNgayTao(ngayTao);
         hd.setGioTao(new Date(ngayTao.getTime()));
@@ -125,7 +132,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         TrangThai tt = new TrangThai();
         tt = (TrangThai) cboTT.getSelectedItem();
         hd.setMaTT(tt.getMaTrangThai());
-        hd.setMaKH(getMaKH());
+        hd.setMaKH(KhachHangGiaoHang.khachHang.getMaKH());
         hDDao.insert(hd);
         txtMaHD.setText(hDDao.selectHDMoi().getMaHD() + "");
     }
@@ -333,33 +340,48 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         buttonGroup1.clearSelection();
         DefaultTableModel a = (DefaultTableModel) tblHDCT.getModel();
         a.setRowCount(0);
+//        KhachHangGiaoHang.clear();
     }
-    
-    void hoanThanh(){
-        
-    }
-    
-    void hienPM(java.awt.event.MouseEvent evt){
-        JPopupMenu pm = new JPopupMenu("pmTrangThai");
-            JMenuItem mniHoanThanh = new JMenuItem("Hoàn thành");
-            JMenuItem mniHoanTra = new JMenuItem("Hoàn trả");
-            mniHoanThanh.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    
-                }
-            });
-            mniHoanTra.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
 
-                }
-            });
-            pm.add(mniHoanThanh);
-            pm.add(mniHoanTra);
-            pm.show(tblHD, evt.getX(), evt.getY());
+    void hoanThanh() {
+        int maHD = (int) tblHD.getValueAt(rowHD, 0);
+        HoaDon hd = hDDao.selectByid(maHD);
+        hd.setMaTT(2);
+        upDateHD(hd);
+        MsgBox.alert(this, "Hoàn thành");
+        fillTableHD();
     }
-    
+
+    void hoanTra() {
+        int maHD = (int) tblHD.getValueAt(rowHD, 0);
+        HoaDon hd = hDDao.selectByid(maHD);
+        hd.setMaTT(3);
+        upDateHD(hd);
+        MsgBox.alert(this, "Hoàn tra");
+        fillTableHD();
+    }
+
+    void hienPM(java.awt.event.MouseEvent evt) {
+        JPopupMenu pm = new JPopupMenu("pmTrangThai");
+        JMenuItem mniHoanThanh = new JMenuItem("Hoàn thành");
+        JMenuItem mniHoanTra = new JMenuItem("Hoàn trả");
+        mniHoanThanh.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                hoanThanh();
+            }
+        });
+        mniHoanTra.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                hoanTra();
+            }
+        });
+        pm.add(mniHoanThanh);
+        pm.add(mniHoanTra);
+        pm.show(tblHD, evt.getX(), evt.getY());
+    }
+
     boolean ktMaHD() {
         if (txtMaHD.getText().isEmpty()) {
             MsgBox.alert(this, "Chưa tạo hóa đơn");
@@ -367,7 +389,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         }
         return true;
     }
-    
+
     void them() {
         if (ktMaHD()) {
             this.row = tblGiaoDichSanPham.getSelectedRow();
@@ -993,6 +1015,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
     private void txtPhiKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPhiKeyReleased
         if (!txtPhi.getText().equals("")) {
             txtThanhTien.setText(getThanhTien() + "");
+
         }
     }//GEN-LAST:event_txtPhiKeyReleased
 
