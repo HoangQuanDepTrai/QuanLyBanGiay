@@ -15,6 +15,7 @@ import com.raven.Form.ThongKe;
 import com.raven.Form.TraHang;
 import com.raven.Swing.JPanel_Login;
 import com.raven.event.EventMenuSelected;
+import com.raven.uitils.Auth;
 import com.raven.uitils.MsgBox;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -57,6 +58,10 @@ public class Main extends javax.swing.JFrame {
                 } else if (index == 9) {
                     setForm(new TraHang());
                 } else if (index == 10) {
+                    if (!Auth.isManager()) {
+                        MsgBox.alert(jPanelBorder1, "Bạn không có quyền xem doanh thu");
+                        return;
+                    }
                     setForm(new ThongKe());
                 }
 

@@ -82,6 +82,44 @@ public class SanPham extends javax.swing.JPanel {
         }
     }
 
+    private boolean ktra() {
+        if (txtTenSP.getText().isEmpty() || txtMaSP.getText().isEmpty() || txtSoLuong.getText().isEmpty() || txtGia.getText().isEmpty() || txtGiaNhap.getText().isEmpty()) {
+            MsgBox.alert(this, "Không được bỏ trống");
+            return false;
+        }
+          List<QLSanPham> sp = spDao.selectAll();
+        for (QLSanPham qLSanPham : sp) {
+            if (qLSanPham.getMaSP().equals(txtMaSP.getText())) {
+                MsgBox.alert(this, "Mã đã tồn tại");
+                return false;
+            }
+        }
+        try {
+            Integer.parseInt(txtSoLuong.getText());
+        } catch (Exception e) {
+            MsgBox.alert(this, "Số lượng không đúng định dạng");
+            return false;
+        }
+        try {
+            Double.parseDouble(txtGia.getText());
+        } catch (Exception e) {
+            MsgBox.alert(this, "Giá không đúng định dạng");
+            return false;
+        }
+        try {
+            Double.parseDouble(txtGiaNhap.getText());
+        } catch (Exception e) {
+            MsgBox.alert(this, "Giá nhập không đúng định dạng");
+            return false;
+        }
+        if (lblHinh.getIcon() == null) {
+            MsgBox.alert(this, "Không được bỏ trống hình");
+            return false;
+        }
+      
+        return true;
+    }
+
     private QLSanPham getForm() {
         QLSanPham sp = new QLSanPham();
         sp.setMaSP(txtMaSP.getText());
@@ -209,32 +247,37 @@ public class SanPham extends javax.swing.JPanel {
     }
 
     void insert() {
-        try {
-            QLSanPham sp = getForm();
-            sp.setLoai(cboLoai.getSelectedItem() + "");
-            spDao.insert(sp);
-            this.fillTable();
-            this.clearForm();
-            MsgBox.alert(this, "Thêm mới thành công");
+        if (ktra()) {
+            try {
+                QLSanPham sp = getForm();
+                sp.setLoai(cboLoai.getSelectedItem() + "");
+                spDao.insert(sp);
+                this.fillTable();
+                this.clearForm();
+                MsgBox.alert(this, "Thêm mới thành công");
 
-        } catch (Exception e) {
-            MsgBox.alert(this, "Thêm mới thất bại");
+            } catch (Exception e) {
+                MsgBox.alert(this, "Thêm mới thất bại");
+            }
         }
 
     }
 
     void update() {
-        try {
-            QLSanPham sp = getForm();
-            String maSP = (String) tblSanPham.getValueAt(row, 0);
-            sp.setMaSP(maSP);
-            sp.setLoai(cboLoai.getSelectedItem() + "");
-            spDao.update(sp);
-            this.fillTable();
-            MsgBox.alert(this, "Cập nhật thành công");
+        if (ktra()) {
+            try {
+                QLSanPham sp = getForm();
+                String maSP = (String) tblSanPham.getValueAt(row, 0);
+                sp.setMaSP(maSP);
+                sp.setLoai(cboLoai.getSelectedItem() + "");
+                spDao.update(sp);
+                this.fillTable();
+                clearForm();
+                MsgBox.alert(this, "Cập nhật thành công");
 
-        } catch (Exception e) {
-            MsgBox.alert(this, "Cập nhật thất bại");
+            } catch (Exception e) {
+                MsgBox.alert(this, "Cập nhật thất bại");
+            }
         }
 
     }
