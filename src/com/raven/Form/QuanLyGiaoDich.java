@@ -72,17 +72,19 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         if (ktHD()) {
             if (rdoGiaoHang.isSelected()) {
                 new Main().showGiaoHang();
-                upDateHD(getHoaDon());
-                MsgBox.alert(this, "Thành công");
-            } else {
                 if (KhachHangGiaoHang.khachHang.getMaKH() == 1) {
                     MsgBox.alert(this, "Nhập thông tin khách giao hàng");
                 } else {
                     HoaDon hd = getHoaDon();
-                    hd.setMaTT(2);
+                    hd.setMaTT(1);
                     upDateHD(hd);
                     MsgBox.alert(this, "Thành công");
                 }
+            } else {
+                HoaDon hd = getHoaDon();
+                hd.setMaTT(2);
+                upDateHD(hd);
+                MsgBox.alert(this, "Thành công gggggggggggggggg");
             }
         }
     }
@@ -338,7 +340,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         buttonGroup1.clearSelection();
         DefaultTableModel a = (DefaultTableModel) tblHDCT.getModel();
         a.setRowCount(0);
-        KhachHangGiaoHang.clear();
+//        KhachHangGiaoHang.clear();
     }
 
     void hoanThanh() {

@@ -33,6 +33,7 @@ public class GiaoHangJDialog extends javax.swing.JDialog {
             KhachHang kh = new KhachHang(WIDTH, txtTen.getText(), txtSoDT.getText(), txtDiaChi.getText());
             KhachHangDao khDao = new KhachHangDao();
             khDao.insert(kh);
+            kh = khDao.selectKHMoi();
             KhachHangGiaoHang.khachHang = kh;
             this.setVisible(false);
         }
@@ -215,6 +216,7 @@ public class GiaoHangJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_btnOKActionPerformed
 
     private void btnThoatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThoatActionPerformed
+        KhachHangGiaoHang.clear();
         this.setVisible(false);
     }//GEN-LAST:event_btnThoatActionPerformed
 
