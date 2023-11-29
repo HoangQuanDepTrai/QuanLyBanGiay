@@ -13,7 +13,7 @@ import com.raven.Entity.QLNhanVien;
  * @author Lê Minh Khôi
  */
 public class Auth {
-      public static QLNhanVien user = null;
+    public static QLNhanVien user = null;
     public static void clear(){
         Auth.user = null;
     }
