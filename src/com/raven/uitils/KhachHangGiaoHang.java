@@ -11,8 +11,11 @@ import com.raven.Entity.KhachHang;
  * @author ADMIN
  */
 public class KhachHangGiaoHang {
+
     public static KhachHang khachHang = new KhachHang(1, "", "", "");
-    public static void clear(){
+
+    public static void clear() {
         khachHang = new KhachHang(1, "", "", "");
     }
+
 }

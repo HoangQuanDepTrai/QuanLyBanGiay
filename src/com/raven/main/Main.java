@@ -17,6 +17,7 @@ import com.raven.Form.WellcomesJDialog;
 import com.raven.Swing.JPanel_Login;
 import com.raven.event.EventMenuSelected;
 import com.raven.uitils.Auth;
+import com.raven.uitils.KhachHangGiaoHang;
 import com.raven.uitils.MsgBox;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -31,6 +32,8 @@ import javax.swing.JPanel;
  */
 public class Main extends javax.swing.JFrame {
 
+    public static boolean welcomeDialogShown = false;
+
     /**
      * Creates new form Main
      */
@@ -38,8 +41,11 @@ public class Main extends javax.swing.JFrame {
         initComponents();
         setBackground(new Color(0, 0, 0, 0));
         menu.iniMoving(this);
-//        showDangNhap();
-      
+        if (!welcomeDialogShown) {
+            new WellcomesJDialog(this, true).setVisible(true);
+            showDangNhap();
+            welcomeDialogShown = true;
+        }
         menu.addEventMenuSelected(new EventMenuSelected() {
             @Override
             public void selected(int index) {
@@ -155,9 +161,7 @@ public class Main extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-        
-          new WellcomesJDialog(this, true).setVisible(true);
-          showDangNhap();
+        //showDangNhap();
     }//GEN-LAST:event_formWindowOpened
 
     /**
