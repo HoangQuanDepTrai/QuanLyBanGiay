@@ -428,6 +428,20 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         }
     }
 
+    boolean ktPhi() {
+        try {
+            double phi = Double.parseDouble(txtPhi.getText());
+            if (phi < 0) {
+                MsgBox.alert(this, "Nhập phí >=0");
+                return false;
+            }
+        } catch (Exception e) {
+            MsgBox.alert(this, "Phí không hợp lệ");
+            return false;
+        }
+        return true;
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -1046,8 +1060,9 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
 
     private void txtPhiKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPhiKeyReleased
         if (!txtPhi.getText().equals("")) {
-            txtThanhTien.setText(getThanhTien() + "");
-
+            if (ktPhi()) {
+                txtThanhTien.setText(getThanhTien() + "");
+            }
         }
     }//GEN-LAST:event_txtPhiKeyReleased
 

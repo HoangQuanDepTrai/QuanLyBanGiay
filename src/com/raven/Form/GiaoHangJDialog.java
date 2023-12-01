@@ -67,7 +67,7 @@ public class GiaoHangJDialog extends javax.swing.JDialog {
     }
 
     boolean ktTenKH(String ten) {
-        String dinhDangTen = "^[A-Za-z ]+$";
+        String dinhDangTen = "^[A-Za-z? ]+$";
         return !ten.matches(dinhDangTen);
 //        if (!ten.matches(dinhDangTen)) {
 //            MsgBox.alert(this, "Tên không đúng định dạng");
@@ -96,7 +96,7 @@ public class GiaoHangJDialog extends javax.swing.JDialog {
             return false;
         }
         if (ktSDT(txtSoDT.getText())) {
-            MsgBox.alert(this, "Số điện thoại không đúng đinh dạng ");
+            MsgBox.alert(this, "Số điện thoại không đúng định dạng ");
             return false;
         }
         return true;
