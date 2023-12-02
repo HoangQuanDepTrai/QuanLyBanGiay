@@ -29,9 +29,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Formatter;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -39,6 +44,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.NumberFormatter;
 
 public class QuanLyGiaoDich extends javax.swing.JPanel {
 
@@ -48,6 +54,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
     TrangThaiDao ttDao = new TrangThaiDao();
     KhachHangDao khDao = new KhachHangDao();
     NhanVienDao nvDao = new NhanVienDao();
+    NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();
     int row = -1;
     int rowHD = -1;
 
@@ -250,8 +257,42 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         return sp.getSoLuong() > 0;
     }
 
-    void updateSanPham() {
+    boolean ktHDCTChuaCo(int maHD, String maSP) {
+        List<HoaDonCT> listHDCT = hDCTDao.selectByMaHD(maHD);
+        for (HoaDonCT hoaDonCT : listHDCT) {
+            if (maSP.equals(hoaDonCT.getMaSP())) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    int getMaHDCTTonTai(String maSP,int maHD){
+        List<HoaDonCT> listHDCT = hDCTDao.selectByMaHD(maHD);
+        for (HoaDonCT hoaDonCT : listHDCT) {
+            if (maSP.equals(hoaDonCT.getMaSP())) {
+                return hoaDonCT.getMaCT();
+            }
+        }
+        return 0;
+    }
 
+    void taoHDCTMoi(QLSanPham sp, int soLuong, int maHD) {
+        HoaDonCT hdct = new HoaDonCT(0, (sp.getGiaBan() * soLuong), sp.getTenSp(), soLuong, sp.getSize(), sp.getMaSP(), maHD);
+        hDCTDao.insert(hdct);
+        tabs.setSelectedIndex(0);
+        fillTableHDCT(maHD);
+        fillTableSP();
+    }
+
+    void capNhatHDCTDaCo(QLSanPham sp, int soLuong, int maHD, String maSP) {
+        HoaDonCT hdct = hDCTDao.selectByid(getMaHDCTTonTai(maSP, maHD));
+        hdct.setSoLuong(hdct.getSoLuong() + soLuong);
+        hdct.setGia(hdct.getSoLuong()*sp.getGiaBan());
+        hDCTDao.update(hdct);
+        tabs.setSelectedIndex(0);
+        fillTableHDCT(maHD);
+        fillTableSP();
     }
 
     void edit() {
@@ -268,20 +309,11 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
                 Loai loai = getLoaiByMaLoai(sp.getLoai());
                 sp.setLoai(loai.getTenLoai());
                 spDao.update(sp);
-//                if (ktHDCTDaTonTai(maSP, maHD)) {
-//                    HoaDonCT hdct = hDCTDao.selectByid(getMaHDCTTonTai(maSP, maHD));
-//                    hdct.setSoLuong(hdct.getSoLuong() + soLuong);
-//                    hDCTDao.update(hdct);
-//                    tabs.setSelectedIndex(0);
-//                    fillTableHDCT(maHD);
-//                    fillTableSP();
-//                } else {
-                HoaDonCT hdct = new HoaDonCT(0, (sp.getGiaBan() * soLuong), sp.getTenSp(), soLuong, sp.getSize(), sp.getMaSP(), maHD);
-                hDCTDao.insert(hdct);
-                tabs.setSelectedIndex(0);
-                fillTableHDCT(maHD);
-                fillTableSP();
-//                }
+                if (ktHDCTChuaCo(maHD, maSP)) {
+                    taoHDCTMoi(sp, soLuong, maHD);
+                } else {
+                    capNhatHDCTDaCo(sp, soLuong, maHD, maSP);
+                }
                 txtThanhTien.setText(getThanhTien() + "");
             }
         } else {
@@ -299,6 +331,10 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
             MsgBox.alert(this, "Chưa nhập tiền khách trả");
             return false;
         }
+        if (txtPhi.getText().isEmpty()) {
+            txtPhi.setText("0");
+            return false;
+        }
         try {
             Double.parseDouble(txtTienKhachTra.getText());
         } catch (Exception e) {
@@ -306,10 +342,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
             txtTienKhachTra.setText("");
             return false;
         }
-        if (txtPhi.getText().isEmpty()) {
-            txtPhi.setText("0");
-            return false;
-        }
+
         try {
             Double.parseDouble(txtPhi.getText());
         } catch (Exception e) {
@@ -325,6 +358,9 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         Double thanhTien;
         LineBorder borderRed = new LineBorder(Color.RED, 1);
         LineBorder borderCyan = new LineBorder(Color.CYAN, 1);
+        if (txtTienKhachTra.getText().equals("")) {
+            return false;
+        }
         if (!txtTienKhachTra.getText().equals("")) {
             try {
                 tKT = Double.parseDouble(txtTienKhachTra.getText());
@@ -340,7 +376,6 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
                 MsgBox.alert(this, "Nhập số");
                 return false;
             }
-
         }
         return true;
     }
@@ -1118,7 +1153,8 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
     private void txtPhiKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPhiKeyReleased
         if (!txtPhi.getText().equals("")) {
             if (ktPhi()) {
-                txtThanhTien.setText(getThanhTien() + "");
+                txtThanhTien.setText(getThanhTien() + ""
+                        + "");
             }
         }
     }//GEN-LAST:event_txtPhiKeyReleased
