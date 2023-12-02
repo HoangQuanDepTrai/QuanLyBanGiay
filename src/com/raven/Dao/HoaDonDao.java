@@ -103,4 +103,19 @@ public class HoaDonDao extends RavenDao<HoaDon, Integer> {
         return list;
     }
 
+    public List<HoaDon> selectByName(String tenKH) {
+        String SELECT_BY_NAME = "SELECT * FROM HOADON INNER JOIN KHACHHANG on HOADON.MAKH = KHACHHANG.MAKH "
+                + "WHERE TENKH LIKE ?";
+        return selectBysql(SELECT_BY_NAME, "%" + tenKH + "%");
+    }
+
+    public HoaDon selectByidHT(Integer id) {
+        String SELECT_BY_ID_HT = "SELECT HOADON.* FROM HOADON INNER JOIN HOADONCT ON HOADON.MAHD = HOADONCT.MAHD WHERE MACT = ?";
+        List<HoaDon> list = selectBysql(SELECT_BY_ID_HT, id);
+        if (list.isEmpty()) {
+            return null;
+        }
+        return list.get(0);
+    }
+
 }

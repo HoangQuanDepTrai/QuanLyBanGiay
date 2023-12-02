@@ -27,6 +27,7 @@ public class HoaDon {
     private String tenNV;
 
     public HoaDon() {
+        
     }
 
     public HoaDon(int maHD, boolean hinhThuc, double phiGiao, double thanhTien, double tienKhachTra, Date ngayTao, Date gioTao, int maKH, int maTT, String maNV) {

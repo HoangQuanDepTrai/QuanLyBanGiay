@@ -29,9 +29,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Formatter;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -39,6 +44,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.NumberFormatter;
 
 public class QuanLyGiaoDich extends javax.swing.JPanel {
 
@@ -48,6 +54,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
     TrangThaiDao ttDao = new TrangThaiDao();
     KhachHangDao khDao = new KhachHangDao();
     NhanVienDao nvDao = new NhanVienDao();
+    NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();
     int row = -1;
     int rowHD = -1;
 
@@ -84,7 +91,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
                 HoaDon hd = getHoaDon();
                 hd.setMaTT(2);
                 upDateHD(hd);
-                MsgBox.alert(this, "Thành công gggggggggggggggg");
+                MsgBox.alert(this, "Thành công");
             }
         }
     }
@@ -214,15 +221,16 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         model.setRowCount(0);
         List<QLSanPham> list = spDao.selectByName(txtTim.getText());
         for (QLSanPham qLSP : list) {
+            Loai loai = new LoaiDao().selectByid(qLSP.getLoai());
             Object[] row = {
                 qLSP.getMaSP(),
                 qLSP.getTenSp(),
                 qLSP.getSize(),
-                qLSP.getLoai(),
+                loai.getTenLoai(),
                 qLSP.getSoLuong(),
                 qLSP.getGiaBan(),};
             model.addRow(row);
-        };
+        }
     }
 
     double getThanhTien() {
@@ -238,20 +246,41 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         return Loai;
     }
 
+    boolean ktSoLuongNhap(int soLuong, int soLuongSP) {
+        if (soLuong > soLuongSP || soLuong <= 0) {
+            return false;
+        }
+        return true;
+    }
+
+    boolean ktSoLuongSP(QLSanPham sp) {
+        return sp.getSoLuong() > 0;
+    }
+
     void edit() {
         int soLuong = Integer.parseInt(JOptionPane.showInputDialog("Nhap so luong"));
         String maSP = (String) tblGiaoDichSanPham.getValueAt(this.row, 0);
         QLSanPham sp = spDao.selectByid(maSP);
-        sp.setSoLuong(sp.getSoLuong() - soLuong);
-        Loai loai = getLoaiByMaLoai(sp.getLoai());
-        sp.setLoai(loai.getTenLoai());
-        spDao.update(sp);
-        if (sp != null) {
-            HoaDonCT hdct = new HoaDonCT(0, (sp.getGiaBan() * soLuong), sp.getTenSp(), soLuong, sp.getSize(), sp.getMaSP(), Integer.parseInt(txtMaHD.getText()));
-            hDCTDao.insert(hdct);
-            tabs.setSelectedIndex(0);
-            fillTableHDCT(Integer.parseInt(txtMaHD.getText()));
-            fillTableSP();
+        if (ktSoLuongSP(sp)) {
+            if (!ktSoLuongNhap(soLuong, sp.getSoLuong())) {
+                MsgBox.alert(this, "Số lượng không hợp lệ");
+                return;
+            } else {
+                sp.setSoLuong(sp.getSoLuong() - soLuong);
+                Loai loai = getLoaiByMaLoai(sp.getLoai());
+                sp.setLoai(loai.getTenLoai());
+                spDao.update(sp);
+                if (sp != null) {
+                    HoaDonCT hdct = new HoaDonCT(0, (sp.getGiaBan() * soLuong), sp.getTenSp(), soLuong, sp.getSize(), sp.getMaSP(), Integer.parseInt(txtMaHD.getText()));
+                    hDCTDao.insert(hdct);
+                    tabs.setSelectedIndex(0);
+                    fillTableHDCT(Integer.parseInt(txtMaHD.getText()));
+                    fillTableSP();
+                }
+            }
+        } else {
+            MsgBox.alert(this, "Hết hàng");
+            return;
         }
     }
 
@@ -321,6 +350,15 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
 
     void huy() {
         if (MsgBox.confirm(this, "Bạn muốn hủy đơn hàng")) {
+            List<HoaDonCT> listHDCT = hDCTDao.selectByMaHD(Integer.parseInt(txtMaHD.getText()));
+            for (HoaDonCT hoaDonCT : listHDCT) {
+                QLSanPham sp = spDao.selectByid(hoaDonCT.getMaSP());
+                sp.setSoLuong(sp.getSoLuong() + hoaDonCT.getSoLuong());
+                Loai loai = getLoaiByMaLoai(sp.getLoai());
+                sp.setLoai(loai.getTenLoai());
+                spDao.update(sp);
+                fillTableSP();
+            }
             hDDao.delete(Integer.parseInt(txtMaHD.getText()));
             lamMoi();
         }
@@ -340,7 +378,6 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         buttonGroup1.clearSelection();
         DefaultTableModel a = (DefaultTableModel) tblHDCT.getModel();
         a.setRowCount(0);
-//        KhachHangGiaoHang.clear();
     }
 
     void hoanThanh() {
@@ -396,6 +433,20 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
             edit();
             txtThanhTien.setText(getThanhTien() + "");
         }
+    }
+
+    boolean ktPhi() {
+        try {
+            double phi = Double.parseDouble(txtPhi.getText());
+            if (phi < 0) {
+                MsgBox.alert(this, "Nhập phí >=0");
+                return false;
+            }
+        } catch (Exception e) {
+            MsgBox.alert(this, "Phí không hợp lệ");
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -978,9 +1029,11 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
 
     private void tblGiaoDichSanPhamMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblGiaoDichSanPhamMousePressed
         if (evt.getClickCount() == 2) {
-            this.row = tblGiaoDichSanPham.rowAtPoint(evt.getPoint());
-            edit();
-            txtThanhTien.setText(getThanhTien() + "");
+            if (ktMaHD()) {
+                this.row = tblGiaoDichSanPham.rowAtPoint(evt.getPoint());
+                edit();
+                txtThanhTien.setText(getThanhTien() + "");
+            }
         }
     }//GEN-LAST:event_tblGiaoDichSanPhamMousePressed
 
@@ -1014,8 +1067,10 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
 
     private void txtPhiKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPhiKeyReleased
         if (!txtPhi.getText().equals("")) {
-            txtThanhTien.setText(getThanhTien() + "");
-
+            if (ktPhi()) {
+                txtThanhTien.setText(getThanhTien() + ""
+                        + "");
+            }
         }
     }//GEN-LAST:event_txtPhiKeyReleased
 
