@@ -390,7 +390,8 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
     }
 
     void huy() {
-        if (MsgBox.confirm(this, "Bạn muốn hủy đơn hàng")) {
+        if (ktMaHD()) {
+            if (MsgBox.confirm(this, "Bạn muốn hủy đơn hàng")) {
             List<HoaDonCT> listHDCT = hDCTDao.selectByMaHD(Integer.parseInt(txtMaHD.getText()));
             for (HoaDonCT hoaDonCT : listHDCT) {
                 QLSanPham sp = spDao.selectByid(hoaDonCT.getMaSP());
@@ -403,7 +404,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
             hDDao.delete(Integer.parseInt(txtMaHD.getText()));
             lamMoi();
         }
-        ;
+        }
     }
 
     void lamMoi() {
