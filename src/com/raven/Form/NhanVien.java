@@ -749,7 +749,15 @@ public class NhanVien extends javax.swing.JPanel {
             new String [] {
                 "MaNV", "Họ tên", "Mật khẩu", "Giới tính", "SDT", "Email", "Chức vụ", "Trạng thái"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         tblNhanVien.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 tblNhanVienMousePressed(evt);
