@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class HoaDonCTDao extends RavenDao<HoaDonCT, Integer>{
     final String INSERT_SQL = "INSERT INTO HOADONCT (GIA, TENSP, SOLUONG, SIZE, MASP, MAHD) VALUES (?, ?, ?, ?, ?, ?)";
-    final String UPDATE_SQL = "UPDATE HOADONCT SET GIA = ?, TENSP = ?, SOLUONG = ?, SIZE = ?, MASP = ?, MAHD WHERE MACT = ?";
+    final String UPDATE_SQL = "UPDATE HOADONCT SET GIA = ?, TENSP = ?, SOLUONG = ?, SIZE = ?, MASP = ?, MAHD = ? WHERE MACT = ?";
     final String DELETE_SQL = "DELETE FROM HOADONCT WHERE MACT = ?";
     final String SELECT_ALL_SQL = "SELECT * FROM HOADONCT";
     final String SELECT_BY_ID_SQL = "SELECT * FROM HOADONCT WHERE MACT = ?";

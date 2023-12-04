@@ -257,6 +257,44 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         return sp.getSoLuong() > 0;
     }
 
+    boolean ktHDCTChuaCo(int maHD, String maSP) {
+        List<HoaDonCT> listHDCT = hDCTDao.selectByMaHD(maHD);
+        for (HoaDonCT hoaDonCT : listHDCT) {
+            if (maSP.equals(hoaDonCT.getMaSP())) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    int getMaHDCTTonTai(String maSP,int maHD){
+        List<HoaDonCT> listHDCT = hDCTDao.selectByMaHD(maHD);
+        for (HoaDonCT hoaDonCT : listHDCT) {
+            if (maSP.equals(hoaDonCT.getMaSP())) {
+                return hoaDonCT.getMaCT();
+            }
+        }
+        return 0;
+    }
+
+    void taoHDCTMoi(QLSanPham sp, int soLuong, int maHD) {
+        HoaDonCT hdct = new HoaDonCT(0, (sp.getGiaBan() * soLuong), sp.getTenSp(), soLuong, sp.getSize(), sp.getMaSP(), maHD);
+        hDCTDao.insert(hdct);
+        tabs.setSelectedIndex(0);
+        fillTableHDCT(maHD);
+        fillTableSP();
+    }
+
+    void capNhatHDCTDaCo(QLSanPham sp, int soLuong, int maHD, String maSP) {
+        HoaDonCT hdct = hDCTDao.selectByid(getMaHDCTTonTai(maSP, maHD));
+        hdct.setSoLuong(hdct.getSoLuong() + soLuong);
+        hdct.setGia(hdct.getSoLuong()*sp.getGiaBan());
+        hDCTDao.update(hdct);
+        tabs.setSelectedIndex(0);
+        fillTableHDCT(maHD);
+        fillTableSP();
+    }
+
     void edit() {
         int soLuong = Integer.parseInt(JOptionPane.showInputDialog("Nhap so luong"));
         String maSP = (String) tblGiaoDichSanPham.getValueAt(this.row, 0);
@@ -266,17 +304,17 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
                 MsgBox.alert(this, "Số lượng không hợp lệ");
                 return;
             } else {
+                int maHD = Integer.parseInt(txtMaHD.getText());
                 sp.setSoLuong(sp.getSoLuong() - soLuong);
                 Loai loai = getLoaiByMaLoai(sp.getLoai());
                 sp.setLoai(loai.getTenLoai());
                 spDao.update(sp);
-                if (sp != null) {
-                    HoaDonCT hdct = new HoaDonCT(0, (sp.getGiaBan() * soLuong), sp.getTenSp(), soLuong, sp.getSize(), sp.getMaSP(), Integer.parseInt(txtMaHD.getText()));
-                    hDCTDao.insert(hdct);
-                    tabs.setSelectedIndex(0);
-                    fillTableHDCT(Integer.parseInt(txtMaHD.getText()));
-                    fillTableSP();
+                if (ktHDCTChuaCo(maHD, maSP)) {
+                    taoHDCTMoi(sp, soLuong, maHD);
+                } else {
+                    capNhatHDCTDaCo(sp, soLuong, maHD, maSP);
                 }
+                txtThanhTien.setText(getThanhTien() + "");
             }
         } else {
             MsgBox.alert(this, "Hết hàng");
@@ -293,6 +331,10 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
             MsgBox.alert(this, "Chưa nhập tiền khách trả");
             return false;
         }
+        if (txtPhi.getText().isEmpty()) {
+            txtPhi.setText("0");
+            return false;
+        }
         try {
             Double.parseDouble(txtTienKhachTra.getText());
         } catch (Exception e) {
@@ -300,10 +342,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
             txtTienKhachTra.setText("");
             return false;
         }
-        if (txtPhi.getText().isEmpty()) {
-            txtPhi.setText("0");
-            return false;
-        }
+
         try {
             Double.parseDouble(txtPhi.getText());
         } catch (Exception e) {
@@ -319,6 +358,9 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         Double thanhTien;
         LineBorder borderRed = new LineBorder(Color.RED, 1);
         LineBorder borderCyan = new LineBorder(Color.CYAN, 1);
+        if (txtTienKhachTra.getText().equals("")) {
+            return false;
+        }
         if (!txtTienKhachTra.getText().equals("")) {
             try {
                 tKT = Double.parseDouble(txtTienKhachTra.getText());
@@ -334,7 +376,6 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
                 MsgBox.alert(this, "Nhập số");
                 return false;
             }
-
         }
         return true;
     }
@@ -349,7 +390,8 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
     }
 
     void huy() {
-        if (MsgBox.confirm(this, "Bạn muốn hủy đơn hàng")) {
+        if (ktMaHD()) {
+            if (MsgBox.confirm(this, "Bạn muốn hủy đơn hàng")) {
             List<HoaDonCT> listHDCT = hDCTDao.selectByMaHD(Integer.parseInt(txtMaHD.getText()));
             for (HoaDonCT hoaDonCT : listHDCT) {
                 QLSanPham sp = spDao.selectByid(hoaDonCT.getMaSP());
@@ -362,7 +404,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
             hDDao.delete(Integer.parseInt(txtMaHD.getText()));
             lamMoi();
         }
-        ;
+        }
     }
 
     void lamMoi() {
@@ -394,8 +436,17 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         HoaDon hd = hDDao.selectByid(maHD);
         hd.setMaTT(3);
         upDateHD(hd);
-        MsgBox.alert(this, "Hoàn tra");
+        List<HoaDonCT> listHDCT = hDCTDao.selectByMaHD(maHD);
+        for (HoaDonCT hoaDonCT : listHDCT) {
+            QLSanPham sp = spDao.selectByid(hoaDonCT.getMaSP());
+            sp.setSoLuong(sp.getSoLuong() + hoaDonCT.getSoLuong());
+            Loai loai = getLoaiByMaLoai(sp.getLoai());
+            sp.setLoai(loai.getTenLoai());
+            spDao.update(sp);
+        }
         fillTableHD();
+        fillTableSP();
+        MsgBox.alert(this, "Hoàn tra");
     }
 
     void hienPM(java.awt.event.MouseEvent evt) {
@@ -449,6 +500,29 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         return true;
     }
 
+//    boolean ktHDCTDaTonTai(String maSP, int maHD) {
+//        List<HoaDonCT> listHDCT = hDCTDao.selectByMaHD(maHD);
+//        if (listHDCT.size()==0) {
+//            return false;
+//        }
+//        for (HoaDonCT hoaDonCT : listHDCT) {
+//            if (maSP.equals(hoaDonCT.getMaSP())) {
+//                System.out.println(hoaDonCT.getMaCT());
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
+//
+//    int getMaHDCTTonTai(String maSP, int maHD) {
+//        List<HoaDonCT> listHDCT = hDCTDao.selectByMaHD(maHD);
+//        for (HoaDonCT hoaDonCT : listHDCT) {
+//            if (maSP.equals(hoaDonCT.getMaSP())) {
+//                return hoaDonCT.getMaCT();
+//            }
+//        }
+//        return 0;
+//    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -915,7 +989,15 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
             new String [] {
                 "Mã SP", "Tên SP", "Size", "Loại", "Số lượng", "Đơn giá"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         tblGiaoDichSanPham.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tblGiaoDichSanPhamMouseClicked(evt);
@@ -1029,10 +1111,14 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
 
     private void tblGiaoDichSanPhamMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblGiaoDichSanPhamMousePressed
         if (evt.getClickCount() == 2) {
+            this.row = tblGiaoDichSanPham.rowAtPoint(evt.getPoint());
             if (ktMaHD()) {
-                this.row = tblGiaoDichSanPham.rowAtPoint(evt.getPoint());
+//                int maHD = Integer.parseInt(txtMaHD.getText());
+//                String maSP = (String) tblGiaoDichSanPham.getValueAt(this.row, 0);
+//                if (ktHDCTDaTonTai(maSP, maHD)) {
                 edit();
-                txtThanhTien.setText(getThanhTien() + "");
+
+//                }
             }
         }
     }//GEN-LAST:event_tblGiaoDichSanPhamMousePressed
