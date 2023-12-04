@@ -47,6 +47,9 @@ public class HoaDonCTDao extends RavenDao<HoaDonCT, Integer>{
     public List<HoaDonCT> selectByMaHD(int MaHD) {
         return selectBysql(SELECT_BY_MAHD,MaHD);
     }
+    public List<HoaDonCT> selectByMaCT(int MaCT) {
+        return selectBysql(SELECT_BY_ID_SQL,MaCT);
+    }
 
     @Override
     public HoaDonCT selectByid(Integer id) {

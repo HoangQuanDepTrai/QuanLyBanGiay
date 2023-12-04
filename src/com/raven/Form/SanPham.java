@@ -121,6 +121,10 @@ public class SanPham extends javax.swing.JPanel {
             MsgBox.alert(this, "Không được bỏ trống hình");
             return false;
         }
+        if (Integer.parseInt(txtSoLuong.getText()) <= 0) {
+            MsgBox.alert(this, "Số lượng không hợp lệ!");
+            return false;
+        }
 
         return true;
     }
