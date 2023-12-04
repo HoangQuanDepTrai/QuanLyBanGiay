@@ -56,7 +56,7 @@ public class WellcomesJDialog extends javax.swing.JDialog {
         lblStatus.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblStatus.setText("Status");
 
-        lblShop1.setFont(new java.awt.Font("Times New Roman", 1, 36)); // NOI18N
+        lblShop1.setFont(new java.awt.Font("Verdana", 1, 36)); // NOI18N
         lblShop1.setForeground(new java.awt.Color(102, 102, 102));
         lblShop1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblShop1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/raven/Icon/RavenXanh2.png"))); // NOI18N
