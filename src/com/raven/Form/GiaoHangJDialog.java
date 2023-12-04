@@ -67,7 +67,7 @@ public class GiaoHangJDialog extends javax.swing.JDialog {
     }
 
     boolean ktTenKH(String ten) {
-        String dinhDangTen = "^[A-Za-z? ]+$";
+        String dinhDangTen = "^[\\p{L}0-9 áÁ]*$";
         return !ten.matches(dinhDangTen);
 //        if (!ten.matches(dinhDangTen)) {
 //            MsgBox.alert(this, "Tên không đúng định dạng");
