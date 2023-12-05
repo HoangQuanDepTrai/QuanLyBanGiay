@@ -316,7 +316,7 @@ public class TraHang extends javax.swing.JPanel {
             hddao.update(hd);
             reset();
         } else {
-            MsgBox.alert(this, "Giá trị rowHDCT không hợp lệ");
+            MsgBox.alert(this, "Giá trị row không hợp lệ");
         }
     }
 
