@@ -93,9 +93,10 @@ public class SanPhamDao extends RavenDao<QLSanPham, String> {
         return selectBysql(SELECT_BY_NAME, "%" + tenSP + "%");
 
     }
-    public QLSanPham selectByIDName(String tenSP) {
-        String SELECT_BY_NAME = "SELECT * FROM SANPHAM WHERE TENSP LIKE ?";
-        List<QLSanPham> splList = selectBysql(SELECT_BY_NAME, "%" + tenSP + "%");
+    public QLSanPham selectByIDName(String tenSP, int maHDCT) {
+        String SELECT_BY_NAME = "SELECT * FROM SANPHAM INNER JOIN HOADONCT ON HOADONCT.MASP = SANPHAM.MASP "
+                + "WHERE SANPHAM.TENSP LIKE ? AND HOADONCT.MACT = ?";
+        List<QLSanPham> splList = selectBysql(SELECT_BY_NAME, "%" + tenSP + "%",maHDCT);
         return splList.get(0);
 
     }

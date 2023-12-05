@@ -23,10 +23,12 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import javax.swing.Box;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -46,6 +48,7 @@ public class TraHang extends javax.swing.JPanel {
     SimpleDateFormat simpledateformat = new SimpleDateFormat("yyyy-MM-dd");
     int rowHD = -1;
     int rowHDCT = -1;
+    int rowHT = -1;
 
     /**
      * Creates new form TraHang
@@ -144,9 +147,34 @@ public class TraHang extends javax.swing.JPanel {
         return thanhtien * 0.9;
     }
 
-    private void setForm(HoaDonCT hdct) {
+    private void setForm(HoaDonCT hdct, int soLuong) {
         txtMaHD.setText(hdct.getMaHD() + "");
-        dcTraHang.setDate(new Date());
+        txtTenKH.setText(getTenKH(hdct));
+        double tienThanhToan = getTienThanhToan(hdct, soLuong);
+        txtTienThanhToan.setText(tienThanhToan + "");
+        txtTienTra.setText(getTienHoanTra(tienThanhToan) + "");
+        txtSoLuong.setText(soLuong + "");
+    }
+
+    private void setFormHT() {
+        int maHD = (int) tblHoanTra.getValueAt(rowHT, 1);
+        String tenKH = (String) tblHoanTra.getValueAt(rowHT, 2);
+        String tienTraString = tblHoanTra.getValueAt(rowHT, 4).toString();
+        double tienTra = Double.parseDouble(tienTraString);
+        String soLuongString = tblHoanTra.getValueAt(rowHT, 3).toString();
+        int soLuong = 0;
+        try {
+            soLuong = Integer.parseInt(soLuongString);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+
+        double tienThanhToan = tienTra + tienTra * 0.1;
+        txtMaHD.setText(maHD + "");
+        txtTenKH.setText(tenKH);
+        txtTienThanhToan.setText(tienThanhToan + "");
+        txtTienTra.setText(tienTra + "");
+        txtSoLuong.setText(soLuong + "");
     }
 
     private String getTenKH(HoaDonCT hdct) {
@@ -163,20 +191,42 @@ public class TraHang extends javax.swing.JPanel {
 
     private void fillTableHoanTra(int maHDCT) {
         DefaultTableModel model = (DefaultTableModel) tblHoanTra.getModel();
-        //model.setRowCount(0);
         try {
-            HoaDonCT hdct = hdctdao.selectByid(maHDCT);
-            if (hdct != null) {
-                Object[] row = {
-                    hdct.getMaCT(),
-                    hdct.getMaHD(),
-                    getTenKH(hdct),
-                    simpledateformat.format(dcTraHang.getDate()),
-                    txtTienTra.getText()
-                };
-                model.addRow(row);
+            int rowCount = model.getRowCount();
+            boolean found = false;
+
+            for (int i = 0; i < rowCount; i++) {
+                int currentMaHDCT = (int) model.getValueAt(i, 0);
+                if (currentMaHDCT == maHDCT) {
+                    found = true;
+                    int soLuongCu = Integer.parseInt(model.getValueAt(i, 3).toString());
+                    int soLuongNhap = Integer.parseInt(txtSoLuong.getText());
+                    int soLuongMoi = soLuongCu + soLuongNhap;
+                    double tienTraCu = Double.parseDouble(model.getValueAt(i, 4).toString());
+                    double tienTraText = Double.parseDouble(txtTienTra.getText());
+                    double tienTraMoi = tienTraCu + tienTraText;
+
+                    model.setValueAt(soLuongMoi, i, 3);
+                    model.setValueAt(tienTraMoi, i, 4);
+                    break;
+                }
+            }
+
+            if (!found) {
+                HoaDonCT hdct = hdctdao.selectByid(maHDCT);
+                if (hdct != null) {
+                    Object[] row = {
+                        hdct.getMaCT(),
+                        hdct.getMaHD(),
+                        getTenKH(hdct),
+                        txtSoLuong.getText(),
+                        txtTienTra.getText()
+                    };
+                    model.addRow(row);
+                }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             MsgBox.alert(this, "Lỗi truy vấn dữ liệu");
         }
     }
@@ -188,39 +238,39 @@ public class TraHang extends javax.swing.JPanel {
         return true;
     }
 
-    private double setgia(QLSanPham sp, int soLuong,HoaDonCT hdct) {
+    private double getGiaHDCT(QLSanPham sp, int soLuong, HoaDonCT hdct) {
         double gia = hdct.getGia() - (sp.getGiaBan() * soLuong);
         return gia;
     }
 
+    private double getThanhTienHD(QLSanPham sp, int soLuong, HoaDon hd) {
+        double thanhtTien = hd.getThanhTien() - (sp.getGiaBan() * soLuong);
+        return thanhtTien;
+    }
+
+//    private int rowCountCT() {
+//        DefaultTableModel model = (DefaultTableModel) tblHoaDonChiTiet.getModel();
+//        int rowCount = model.getRowCount();
+//        return rowCount;
+//    }
     private void editHDCT() {
         try {
             int soLuong = Integer.parseInt(JOptionPane.showInputDialog("Nhập số lượng:"));
             int soLuongMua = (int) tblHoaDonChiTiet.getValueAt(rowHDCT, 3);
-
             if (ktraSLNhap(soLuong, soLuongMua)) {
                 int maHDCT = (int) tblHoaDonChiTiet.getValueAt(rowHDCT, 0);
-
                 HoaDonCT hdct = hdctdao.selectByid(maHDCT);
-                setForm(hdct);
+                setForm(hdct, soLuong);
                 int soLuongConLai = soLuongMua - soLuong;
-//                if (soLuongConLai < 0) {
-//                    MsgBox.alert(this, "Số lượng không đủ để chỉnh sửa!");
-//                    return;
-//                }
-                
-                int maHD = (int) tblHoaDonChiTiet.getValueAt(rowHDCT, 1);
                 String tenSP = tblHoaDonChiTiet.getValueAt(rowHDCT, 2).toString();
-                QLSanPham listSP = spdao.selectByIDName(tenSP);
+                QLSanPham sp = spdao.selectByIDName(tenSP, maHDCT);
                 hdct.setSoLuong(soLuongConLai);
-                hdct.setGia(setgia(listSP, soLuong, hdct));
+                hdct.setGia(getGiaHDCT(sp, soLuong, hdct));
                 hdctdao.update(hdct);
-                txtTenKH.setText(getTenKH(hdct));
-                txtTienThanhToan.setText(getTienThanhToan(hdct, soLuong) + "");
-                txtTienTra.setText(getTienThanhToan(hdct, soLuong) + "");
                 fillTableHoanTra(maHDCT);
-                if (soLuongConLai == 0) {
+                if (soLuongConLai <= 0 && hdct.getMaCT() == maHDCT) {
                     hdctdao.delete(maHDCT);
+                    rowHDCT = -1;
                 }
             } else {
                 MsgBox.alert(this, "Số lượng không hợp lệ");
@@ -245,9 +295,29 @@ public class TraHang extends javax.swing.JPanel {
         txtTenKH.setText("");
         txtTienThanhToan.setText("");
         txtTienTra.setText("");
-        dcTraHang.setDateFormatString("");
+        txtSoLuong.setText("");
         DefaultTableModel model = (DefaultTableModel) tblHoanTra.getModel();
         model.setRowCount(0);
+    }
+
+    private void hoanTra() {
+        if (rowHDCT >= 0 && rowHDCT < tblHoaDonChiTiet.getRowCount()) {
+            int maHDCT = (int) tblHoaDonChiTiet.getValueAt(rowHDCT, 0);
+            int soLuong = Integer.parseInt(txtSoLuong.getText());
+            String tenSP = tblHoaDonChiTiet.getValueAt(rowHDCT, 2).toString();
+            QLSanPham sp = spdao.selectByIDName(tenSP, maHDCT);
+            int soLuongSPMoi = sp.getSoLuong() + soLuong;
+            sp.setSoLuong(soLuongSPMoi);
+            spdao.update(sp);
+            int maHD = (int) tblHoaDonChiTiet.getValueAt(rowHDCT, 1);
+            HoaDon hd = hddao.selectByid(maHD);
+            hd.setThanhTien(getThanhTienHD(sp, soLuong, hd));
+            hd.setMaTT(3);
+            hddao.update(hd);
+            reset();
+        } else {
+            MsgBox.alert(this, "Giá trị rowHDCT không hợp lệ");
+        }
     }
 
     /**
@@ -275,7 +345,7 @@ public class TraHang extends javax.swing.JPanel {
         jButton1 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblHoanTra = new javax.swing.JTable();
-        dcTraHang = new com.toedter.calendar.JDateChooser();
+        txtSoLuong = new javax.swing.JTextField();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         tblHoaDonChiTiet = new javax.swing.JTable();
@@ -314,14 +384,20 @@ public class TraHang extends javax.swing.JPanel {
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel5.setText("Ngày trả hàng");
+        jLabel5.setText("Số lượng");
 
         jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(255, 255, 255));
         jLabel6.setText("Tổng tiền hoàn trả");
 
+        txtTenKH.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+
+        txtMaHD.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+
+        txtTienThanhToan.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         txtTienThanhToan.setEnabled(false);
 
+        txtTienTra.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         txtTienTra.setEnabled(false);
 
         jButton1.setBackground(new java.awt.Color(52, 228, 52));
@@ -340,10 +416,25 @@ public class TraHang extends javax.swing.JPanel {
 
             },
             new String [] {
-                "Mã HDCT", "Mã HD", "Tên KH", "Ngày trả", "Tổng tiền trả"
+                "Mã HDCT", "Mã HD", "Tên KH", "Số lượng ", "Tổng tiền trả"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tblHoanTra.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                tblHoanTraMousePressed(evt);
+            }
+        });
         jScrollPane1.setViewportView(tblHoanTra);
+
+        txtSoLuong.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
@@ -367,8 +458,8 @@ public class TraHang extends javax.swing.JPanel {
                                     .addComponent(txtTienTra, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGroup(jPanel6Layout.createSequentialGroup()
                                     .addComponent(jLabel5)
-                                    .addGap(38, 38, 38)
-                                    .addComponent(dcTraHang, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGap(68, 68, 68)
+                                    .addComponent(txtSoLuong))
                                 .addGroup(jPanel6Layout.createSequentialGroup()
                                     .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addGap(80, 80, 80)
@@ -401,9 +492,9 @@ public class TraHang extends javax.swing.JPanel {
                             .addComponent(jLabel4)
                             .addComponent(txtTienThanhToan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(dcTraHang, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtSoLuong, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel6)
@@ -418,15 +509,20 @@ public class TraHang extends javax.swing.JPanel {
 
         tblHoaDonChiTiet.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
+
             },
             new String [] {
                 "Mã HDCT", "Mã HD", "Tên SP", "Số lượng ", "Tổng tiền"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         tblHoaDonChiTiet.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 tblHoaDonChiTietMousePressed(evt);
@@ -484,17 +580,21 @@ public class TraHang extends javax.swing.JPanel {
             new String [] {
                 "Mã HD", "Tên KH", "Ngày mua", "Hạn trả", "Thành tiền", "Người tạo"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         tblHoaDon.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 tblHoaDonMousePressed(evt);
             }
         });
         jScrollPane2.setViewportView(tblHoaDon);
-        if (tblHoaDon.getColumnModel().getColumnCount() > 0) {
-            tblHoaDon.getColumnModel().getColumn(4).setHeaderValue("Thành tiền");
-            tblHoaDon.getColumnModel().getColumn(5).setHeaderValue("Người tạo");
-        }
 
         jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(255, 255, 255));
@@ -587,7 +687,25 @@ public class TraHang extends javax.swing.JPanel {
     private void tblHoaDonMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblHoaDonMousePressed
         if (evt.getClickCount() == 2) {
             rowHD = tblHoaDon.rowAtPoint(evt.getPoint());
-            editHD();
+            if (rowHD != -1) {
+                Object value = tblHoaDon.getValueAt(rowHD, 3);
+                if (value instanceof String) {
+                    String dateStr = (String) value;
+                    try {
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                        Date hanTra = dateFormat.parse(dateStr);
+                        if (hanTra.before(new Date())) {
+                            MsgBox.alert(this, "Đã quá hạn trả hàng");
+                            return;
+                        }
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                    editHD();
+                }
+
+            }
         }
     }//GEN-LAST:event_tblHoaDonMousePressed
 
@@ -604,23 +722,30 @@ public class TraHang extends javax.swing.JPanel {
         tim();
     }//GEN-LAST:event_txtTimKiemKeyReleased
 
-    
+
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        reset();
+        hoanTra();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void tblHoaDonChiTietMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblHoaDonChiTietMousePressed
         if (evt.getClickCount() == 2) {
             rowHDCT = tblHoaDonChiTiet.rowAtPoint(evt.getPoint());
             editHDCT();
-            editHD();
+            int maHD = (int) tblHoaDon.getValueAt(rowHD, 0);
+            fillTableHDCT(maHD);
         }
     }//GEN-LAST:event_tblHoaDonChiTietMousePressed
+
+    private void tblHoanTraMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblHoanTraMousePressed
+        if (evt.getClickCount() == 2) {
+            rowHT = tblHoanTra.rowAtPoint(evt.getPoint());
+            setFormHT();
+        }
+    }//GEN-LAST:event_tblHoanTraMousePressed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> cboTT;
-    private com.toedter.calendar.JDateChooser dcTraHang;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -642,6 +767,7 @@ public class TraHang extends javax.swing.JPanel {
     private javax.swing.JTable tblHoaDonChiTiet;
     private javax.swing.JTable tblHoanTra;
     private javax.swing.JTextField txtMaHD;
+    private javax.swing.JTextField txtSoLuong;
     private javax.swing.JTextField txtTenKH;
     private javax.swing.JTextField txtTienThanhToan;
     private javax.swing.JTextField txtTienTra;
