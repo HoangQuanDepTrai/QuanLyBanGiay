@@ -41,11 +41,11 @@ public class Main extends javax.swing.JFrame {
         initComponents();
         setBackground(new Color(0, 0, 0, 0));
         menu.iniMoving(this);
-        if (!welcomeDialogShown) {
-            new WellcomesJDialog(this, true).setVisible(true);
-            showDangNhap();
-            welcomeDialogShown = true;
-        }
+//        if (!welcomeDialogShown) {
+//            new WellcomesJDialog(this, true).setVisible(true);
+//            showDangNhap();
+//            welcomeDialogShown = true;
+//        }
         menu.addEventMenuSelected(new EventMenuSelected() {
             @Override
             public void selected(int index) {
