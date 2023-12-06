@@ -169,7 +169,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
                 model.addRow(row);
             }
         } catch (Exception e) {
-            MsgBox.alert(this, "Lỗi truy vấn dữ liệu");
+            MsgBox.alert(this, "Lỗi truy vấn dữ liệu ");
         }
     }
 
@@ -191,7 +191,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
                 model.addRow(row);
             }
         } catch (Exception e) {
-            MsgBox.alert(this, "Lỗi truy vấn dữ liệu");
+            MsgBox.alert(this, "Lỗi truy vấn dữ liệu hdct");
         }
     }
 
@@ -212,7 +212,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
                 model.addRow(row);
             }
         } catch (Exception e) {
-            MsgBox.alert(this, "Lỗi truy vấn dữ liệu");
+            MsgBox.alert(this, "Lỗi truy vấn dữ liệu hd");
         }
     }
 
