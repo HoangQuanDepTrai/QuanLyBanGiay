@@ -333,7 +333,15 @@ public class ThongKe extends javax.swing.JPanel {
             new String [] {
                 "Mã DH", "Tên KH", "Tên NV", "Thành tiền"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jScrollPane2.setViewportView(tblDTNgay);
 
         cboTTNgay.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -482,7 +490,15 @@ public class ThongKe extends javax.swing.JPanel {
             new String [] {
                 "Mã DH", "Tên KH", "Tên NV", "Thành tiền"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, true
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jScrollPane3.setViewportView(tblDTThang);
 
         jLabel25.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
@@ -610,7 +626,15 @@ public class ThongKe extends javax.swing.JPanel {
             new String [] {
                 "Mã DH", "Tên KH", "Tên NV", "Thành tiền"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jScrollPane4.setViewportView(tblDTNam);
 
         cboTTNam.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
