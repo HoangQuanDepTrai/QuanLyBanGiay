@@ -29,6 +29,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -47,7 +48,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.text.NumberFormatter;
 
 public class QuanLyGiaoDich extends javax.swing.JPanel {
-
+    
     HoaDonDao hDDao = new HoaDonDao();
     HoaDonCTDao hDCTDao = new HoaDonCTDao();
     SanPhamDao spDao = new SanPhamDao();
@@ -58,24 +59,24 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
     int row = -1;
     int rowHD = -1;
     int rowHDCT = -1;
-
+    
     public QuanLyGiaoDich() {
         initComponents();
         init();
     }
-
+    
     void init() {
         dcNgayTao.setDateFormatString("dd-MM-yyyy");
         fillTableSP();
         loadCBOTrangThai();
     }
-
+    
     void upDateHD(HoaDon hd) {
         hDDao.update(hd);
         lamMoi();
         fillTableHD();
     }
-
+    
     public void thanhToan() {
         if (ktHD()) {
             if (rdoGiaoHang.isSelected()) {
@@ -110,7 +111,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         tt = (TrangThai) cboTT.getSelectedItem();
         return tt.getMaTrangThai();
     }
-
+    
     HoaDon getHoaDon() {
         TrangThai tt = (TrangThai) cboTT.getSelectedItem();
         HoaDon hd = new HoaDon();
@@ -126,7 +127,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         hd.setMaNV(Auth.user.getManv());
         return hd;
     }
-
+    
     void taoDon() {
         SimpleDateFormat sdf = new SimpleDateFormat("hh:MM:ss");
         Date ngayTao = new Date();
@@ -144,7 +145,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         hDDao.insert(hd);
         txtMaHD.setText(hDDao.selectHDMoi().getMaHD() + "");
     }
-
+    
     private String getTrangThai(int soLuong) {
         if (soLuong == 0) {
             return "Không hoạt động";
@@ -152,7 +153,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
             return "Hoạt động";
         }
     }
-
+    
     private void fillTableSP() {
         DefaultTableModel model = (DefaultTableModel) tblGiaoDichSanPham.getModel();
         model.setRowCount(0);
@@ -173,7 +174,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
             MsgBox.alert(this, "Lỗi truy vấn dữ liệu");
         }
     }
-
+    
     private void fillTableHDCT(int MaHD) {
         DefaultTableModel model = (DefaultTableModel) tblHDCT.getModel();
         model.setRowCount(0);
@@ -195,7 +196,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
             MsgBox.alert(this, "Lỗi truy vấn dữ liệu");
         }
     }
-
+    
     void fillTableHD() {
         TrangThai tt = (TrangThai) cboTT.getSelectedItem();
         DefaultTableModel model = (DefaultTableModel) tblHD.getModel();
@@ -216,7 +217,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
             MsgBox.alert(this, "Lỗi truy vấn dữ liệu");
         }
     }
-
+    
     void tim() {
         DefaultTableModel model = (DefaultTableModel) tblGiaoDichSanPham.getModel();
         model.setRowCount(0);
@@ -233,7 +234,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
             model.addRow(row);
         }
     }
-
+    
     double getThanhTien() {
         double thanhTien = 0;
         for (int i = 0; i < tblHDCT.getRowCount(); i++) {
@@ -241,23 +242,23 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         }
         return thanhTien + Double.parseDouble(txtPhi.getText());
     }
-
+    
     Loai getLoaiByMaLoai(String maLoai) {
         Loai Loai = new LoaiDao().selectByid(maLoai);
         return Loai;
     }
-
+    
     boolean ktSoLuongNhap(int soLuong, int soLuongSP) {
         if (soLuong > soLuongSP || soLuong <= 0) {
             return false;
         }
         return true;
     }
-
+    
     boolean ktSoLuongSP(QLSanPham sp) {
         return sp.getSoLuong() > 0;
     }
-
+    
     boolean ktHDCTChuaCo(int maHD, String maSP) {
         List<HoaDonCT> listHDCT = hDCTDao.selectByMaHD(maHD);
         for (HoaDonCT hoaDonCT : listHDCT) {
@@ -267,7 +268,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         }
         return true;
     }
-
+    
     int getMaHDCTTonTai(String maSP, int maHD) {
         List<HoaDonCT> listHDCT = hDCTDao.selectByMaHD(maHD);
         for (HoaDonCT hoaDonCT : listHDCT) {
@@ -277,7 +278,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         }
         return 0;
     }
-
+    
     void taoHDCTMoi(QLSanPham sp, int soLuong, int maHD) {
         HoaDonCT hdct = new HoaDonCT(0, (sp.getGiaBan() * soLuong), sp.getTenSp(), soLuong, sp.getSize(), sp.getMaSP(), maHD);
         hDCTDao.insert(hdct);
@@ -285,7 +286,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         fillTableHDCT(maHD);
         fillTableSP();
     }
-
+    
     void capNhatHDCTDaCo(QLSanPham sp, int soLuong, int maHD, String maSP) {
         HoaDonCT hdct = hDCTDao.selectByid(getMaHDCTTonTai(maSP, maHD));
         hdct.setSoLuong(hdct.getSoLuong() + soLuong);
@@ -295,7 +296,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         fillTableHDCT(maHD);
         fillTableSP();
     }
-
+    
     void edit() {
         int soLuong = Integer.parseInt(JOptionPane.showInputDialog("Nhap so luong"));
         String maSP = (String) tblGiaoDichSanPham.getValueAt(this.row, 0);
@@ -315,14 +316,15 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
                 } else {
                     capNhatHDCTDaCo(sp, soLuong, maHD, maSP);
                 }
-                txtThanhTien.setText(getThanhTien() + "");
+                DecimalFormat df = new DecimalFormat("#,###");
+                txtThanhTien.setText(String.valueOf(df.format(getThanhTien())));
             }
         } else {
             MsgBox.alert(this, "Hết hàng");
             return;
         }
     }
-
+    
     boolean ktHD() {
         if (txtMaHD.getText().isEmpty()) {
             MsgBox.alert(this, "Chưa tạo hóa đơn");
@@ -343,7 +345,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
             txtTienKhachTra.setText("");
             return false;
         }
-
+        
         try {
             Double.parseDouble(txtPhi.getText());
         } catch (Exception e) {
@@ -353,7 +355,21 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         }
         return true;
     }
-
+    
+    double toDouble(String chuoiSo) {
+        DecimalFormat decimalFormat = new DecimalFormat("#");
+        decimalFormat.setParseIntegerOnly(true);
+        
+        double number;
+        try {
+            number = decimalFormat.parse(chuoiSo).intValue();
+            return number;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
     boolean ktTienKhachTra() {
         Double tKT;
         Double thanhTien;
@@ -365,9 +381,10 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         if (!txtTienKhachTra.getText().equals("")) {
             try {
                 tKT = Double.parseDouble(txtTienKhachTra.getText());
-                thanhTien = Double.parseDouble(txtThanhTien.getText());
+                thanhTien = getThanhTien();
                 if (tKT < thanhTien) {
                     txtTienKhachTra.setBorder(borderRed);
+                    txtTienDu.setText("");
                     return false;
                 } else {
                     txtTienKhachTra.setBorder(borderCyan);
@@ -380,7 +397,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         }
         return true;
     }
-
+    
     void loadCBOTrangThai() {
         DefaultComboBoxModel model = (DefaultComboBoxModel) cboTT.getModel();
         model.removeAllElements();
@@ -389,7 +406,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
             model.addElement(trangThai);
         }
     }
-
+    
     void huy() {
         if (ktMaHD()) {
             if (MsgBox.confirm(this, "Bạn muốn hủy đơn hàng")) {
@@ -407,7 +424,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
             }
         }
     }
-
+    
     void lamMoi() {
         txtMaHD.setText("");
         txtMaNV.setText("");
@@ -422,7 +439,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         DefaultTableModel a = (DefaultTableModel) tblHDCT.getModel();
         a.setRowCount(0);
     }
-
+    
     void hoanThanh() {
         int maHD = (int) tblHD.getValueAt(rowHD, 0);
         HoaDon hd = hDDao.selectByid(maHD);
@@ -431,7 +448,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         MsgBox.alert(this, "Hoàn thành");
         fillTableHD();
     }
-
+    
     void hoanTra() {
         int maHD = (int) tblHD.getValueAt(rowHD, 0);
         HoaDon hd = hDDao.selectByid(maHD);
@@ -449,7 +466,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         fillTableSP();
         MsgBox.alert(this, "Hoàn tra");
     }
-
+    
     void hienPM(java.awt.event.MouseEvent evt) {
         JPopupMenu pm = new JPopupMenu("pmTrangThai");
         JMenuItem mniHoanThanh = new JMenuItem("Hoàn thành");
@@ -470,13 +487,13 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         pm.add(mniHoanTra);
         pm.show(tblHD, evt.getX(), evt.getY());
     }
-
+    
     void soLuongHDCT() {
         int soLuong = Integer.parseInt(JOptionPane.showInputDialog("Nhap so luong"));
         int maHD = Integer.parseInt(txtMaHD.getText());
         int maHDCT = (int) tblHDCT.getValueAt(this.rowHDCT, 0);
         HoaDonCT hdct = hDCTDao.selectByid(maHDCT);
-
+        
         QLSanPham sp = spDao.selectByid(hdct.getMaSP());
         if (ktSoLuongNhap(soLuong, sp.getSoLuong())) {
             if (soLuong < hdct.getSoLuong()) {
@@ -490,34 +507,36 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
                 sp.setLoai(loai.getTenLoai());
                 spDao.update(sp);
             }
-
+            
             hdct.setGia(hdct.getGia() / hdct.getSoLuong() * soLuong);
             hdct.setSoLuong(soLuong);
             hDCTDao.update(hdct);
             fillTableHDCT(maHD);
             fillTableSP();
-            txtThanhTien.setText(getThanhTien() + "");
+            DecimalFormat df = new DecimalFormat("#,###");
+            txtThanhTien.setText(String.valueOf(df.format(getThanhTien())));
         }
     }
-
+    
     void xoaHDCT() {
         int maHD = Integer.parseInt(txtMaHD.getText());
         int maHDCT = (int) tblHDCT.getValueAt(this.rowHDCT, 0);
-
+        
         HoaDonCT hdct = hDCTDao.selectByid(maHDCT);
         QLSanPham sp = spDao.selectByid(hdct.getMaSP());
-
+        
         sp.setSoLuong(sp.getSoLuong() + hdct.getSoLuong());
         Loai loai = getLoaiByMaLoai(sp.getLoai());
         sp.setLoai(loai.getTenLoai());
         spDao.update(sp);
-
+        
         hDCTDao.delete(maHDCT);
         fillTableHDCT(maHD);
         fillTableSP();
-        txtThanhTien.setText(getThanhTien() + "");
+        DecimalFormat df = new DecimalFormat("#,###");
+        txtThanhTien.setText(String.valueOf(df.format(getThanhTien())));
     }
-
+    
     void hienPMSX(java.awt.event.MouseEvent evt) {
         JPopupMenu pm = new JPopupMenu("pmSuaXoa");
         JMenuItem mniSua = new JMenuItem("Sữa");
@@ -538,7 +557,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         pm.add(mniXoa);
         pm.show(tblHDCT, evt.getX(), evt.getY());
     }
-
+    
     boolean ktMaHD() {
         if (txtMaHD.getText().isEmpty()) {
             MsgBox.alert(this, "Chưa tạo hóa đơn");
@@ -546,15 +565,16 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         }
         return true;
     }
-
+    
     void them() {
         if (ktMaHD()) {
             this.row = tblGiaoDichSanPham.getSelectedRow();
             edit();
-            txtThanhTien.setText(getThanhTien() + "");
+            DecimalFormat df = new DecimalFormat("#,###");
+            txtThanhTien.setText(String.valueOf(df.format(getThanhTien())));
         }
     }
-
+    
     boolean ktPhi() {
         try {
             double phi = Double.parseDouble(txtPhi.getText());
@@ -569,29 +589,6 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         return true;
     }
 
-//    boolean ktHDCTDaTonTai(String maSP, int maHD) {
-//        List<HoaDonCT> listHDCT = hDCTDao.selectByMaHD(maHD);
-//        if (listHDCT.size()==0) {
-//            return false;
-//        }
-//        for (HoaDonCT hoaDonCT : listHDCT) {
-//            if (maSP.equals(hoaDonCT.getMaSP())) {
-//                System.out.println(hoaDonCT.getMaCT());
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-//
-//    int getMaHDCTTonTai(String maSP, int maHD) {
-//        List<HoaDonCT> listHDCT = hDCTDao.selectByMaHD(maHD);
-//        for (HoaDonCT hoaDonCT : listHDCT) {
-//            if (maSP.equals(hoaDonCT.getMaSP())) {
-//                return hoaDonCT.getMaCT();
-//            }
-//        }
-//        return 0;
-//    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -1196,12 +1193,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         if (evt.getClickCount() == 2) {
             this.row = tblGiaoDichSanPham.rowAtPoint(evt.getPoint());
             if (ktMaHD()) {
-//                int maHD = Integer.parseInt(txtMaHD.getText());
-//                String maSP = (String) tblGiaoDichSanPham.getValueAt(this.row, 0);
-//                if (ktHDCTDaTonTai(maSP, maHD)) {
                 edit();
-
-//                }
             }
         }
     }//GEN-LAST:event_tblGiaoDichSanPhamMousePressed
@@ -1237,8 +1229,8 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
     private void txtPhiKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPhiKeyReleased
         if (!txtPhi.getText().equals("")) {
             if (ktPhi()) {
-                txtThanhTien.setText(getThanhTien() + ""
-                        + "");
+                DecimalFormat df = new DecimalFormat("#,###");
+                txtThanhTien.setText(String.valueOf(df.format(getThanhTien())));
             }
         }
     }//GEN-LAST:event_txtPhiKeyReleased
@@ -1250,9 +1242,11 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
     private void txtTienKhachTraKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtTienKhachTraKeyReleased
         if (ktTienKhachTra()) {
             double tKT = Double.parseDouble(txtTienKhachTra.getText());
-            double thanhTien = Double.parseDouble(txtThanhTien.getText());
+            double thanhTien = getThanhTien();
             double tienDu = tKT - thanhTien;
-            txtTienDu.setText(tienDu + "");
+            if (tienDu >= 0) {
+                txtTienDu.setText(tienDu + "");
+            }            
         }
     }//GEN-LAST:event_txtTienKhachTraKeyReleased
 
