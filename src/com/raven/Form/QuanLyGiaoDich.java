@@ -57,6 +57,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
     NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();
     int row = -1;
     int rowHD = -1;
+    int rowHDCT = -1;
 
     public QuanLyGiaoDich() {
         initComponents();
@@ -169,7 +170,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
                 model.addRow(row);
             }
         } catch (Exception e) {
-            MsgBox.alert(this, "Lỗi truy vấn dữ liệu ");
+            MsgBox.alert(this, "Lỗi truy vấn dữ liệu");
         }
     }
 
@@ -191,7 +192,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
                 model.addRow(row);
             }
         } catch (Exception e) {
-            MsgBox.alert(this, "Lỗi truy vấn dữ liệu hdct");
+            MsgBox.alert(this, "Lỗi truy vấn dữ liệu");
         }
     }
 
@@ -212,7 +213,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
                 model.addRow(row);
             }
         } catch (Exception e) {
-            MsgBox.alert(this, "Lỗi truy vấn dữ liệu hd");
+            MsgBox.alert(this, "Lỗi truy vấn dữ liệu");
         }
     }
 
@@ -266,8 +267,8 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         }
         return true;
     }
-    
-    int getMaHDCTTonTai(String maSP,int maHD){
+
+    int getMaHDCTTonTai(String maSP, int maHD) {
         List<HoaDonCT> listHDCT = hDCTDao.selectByMaHD(maHD);
         for (HoaDonCT hoaDonCT : listHDCT) {
             if (maSP.equals(hoaDonCT.getMaSP())) {
@@ -288,7 +289,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
     void capNhatHDCTDaCo(QLSanPham sp, int soLuong, int maHD, String maSP) {
         HoaDonCT hdct = hDCTDao.selectByid(getMaHDCTTonTai(maSP, maHD));
         hdct.setSoLuong(hdct.getSoLuong() + soLuong);
-        hdct.setGia(hdct.getSoLuong()*sp.getGiaBan());
+        hdct.setGia(hdct.getSoLuong() * sp.getGiaBan());
         hDCTDao.update(hdct);
         tabs.setSelectedIndex(0);
         fillTableHDCT(maHD);
@@ -392,18 +393,18 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
     void huy() {
         if (ktMaHD()) {
             if (MsgBox.confirm(this, "Bạn muốn hủy đơn hàng")) {
-            List<HoaDonCT> listHDCT = hDCTDao.selectByMaHD(Integer.parseInt(txtMaHD.getText()));
-            for (HoaDonCT hoaDonCT : listHDCT) {
-                QLSanPham sp = spDao.selectByid(hoaDonCT.getMaSP());
-                sp.setSoLuong(sp.getSoLuong() + hoaDonCT.getSoLuong());
-                Loai loai = getLoaiByMaLoai(sp.getLoai());
-                sp.setLoai(loai.getTenLoai());
-                spDao.update(sp);
-                fillTableSP();
+                List<HoaDonCT> listHDCT = hDCTDao.selectByMaHD(Integer.parseInt(txtMaHD.getText()));
+                for (HoaDonCT hoaDonCT : listHDCT) {
+                    QLSanPham sp = spDao.selectByid(hoaDonCT.getMaSP());
+                    sp.setSoLuong(sp.getSoLuong() + hoaDonCT.getSoLuong());
+                    Loai loai = getLoaiByMaLoai(sp.getLoai());
+                    sp.setLoai(loai.getTenLoai());
+                    spDao.update(sp);
+                    fillTableSP();
+                }
+                hDDao.delete(Integer.parseInt(txtMaHD.getText()));
+                lamMoi();
             }
-            hDDao.delete(Integer.parseInt(txtMaHD.getText()));
-            lamMoi();
-        }
         }
     }
 
@@ -468,6 +469,74 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         pm.add(mniHoanThanh);
         pm.add(mniHoanTra);
         pm.show(tblHD, evt.getX(), evt.getY());
+    }
+
+    void soLuongHDCT() {
+        int soLuong = Integer.parseInt(JOptionPane.showInputDialog("Nhap so luong"));
+        int maHD = Integer.parseInt(txtMaHD.getText());
+        int maHDCT = (int) tblHDCT.getValueAt(this.rowHDCT, 0);
+        HoaDonCT hdct = hDCTDao.selectByid(maHDCT);
+
+        QLSanPham sp = spDao.selectByid(hdct.getMaSP());
+        if (ktSoLuongNhap(soLuong, sp.getSoLuong())) {
+            if (soLuong < hdct.getSoLuong()) {
+                sp.setSoLuong(sp.getSoLuong() - soLuong + hdct.getSoLuong());
+                Loai loai = getLoaiByMaLoai(sp.getLoai());
+                sp.setLoai(loai.getTenLoai());
+                spDao.update(sp);
+            } else if (soLuong > hdct.getSoLuong()) {
+                sp.setSoLuong(sp.getSoLuong() - (soLuong - hdct.getSoLuong()));
+                Loai loai = getLoaiByMaLoai(sp.getLoai());
+                sp.setLoai(loai.getTenLoai());
+                spDao.update(sp);
+            }
+
+            hdct.setGia(hdct.getGia() / hdct.getSoLuong() * soLuong);
+            hdct.setSoLuong(soLuong);
+            hDCTDao.update(hdct);
+            fillTableHDCT(maHD);
+            fillTableSP();
+            txtThanhTien.setText(getThanhTien() + "");
+        }
+    }
+
+    void xoaHDCT() {
+        int maHD = Integer.parseInt(txtMaHD.getText());
+        int maHDCT = (int) tblHDCT.getValueAt(this.rowHDCT, 0);
+
+        HoaDonCT hdct = hDCTDao.selectByid(maHDCT);
+        QLSanPham sp = spDao.selectByid(hdct.getMaSP());
+
+        sp.setSoLuong(sp.getSoLuong() + hdct.getSoLuong());
+        Loai loai = getLoaiByMaLoai(sp.getLoai());
+        sp.setLoai(loai.getTenLoai());
+        spDao.update(sp);
+
+        hDCTDao.delete(maHDCT);
+        fillTableHDCT(maHD);
+        fillTableSP();
+        txtThanhTien.setText(getThanhTien() + "");
+    }
+
+    void hienPMSX(java.awt.event.MouseEvent evt) {
+        JPopupMenu pm = new JPopupMenu("pmSuaXoa");
+        JMenuItem mniSua = new JMenuItem("Sữa");
+        JMenuItem mniXoa = new JMenuItem("Xóa");
+        mniSua.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                soLuongHDCT();
+            }
+        });
+        mniXoa.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                xoaHDCT();
+            }
+        });
+        pm.add(mniSua);
+        pm.add(mniXoa);
+        pm.show(tblHDCT, evt.getX(), evt.getY());
     }
 
     boolean ktMaHD() {
@@ -536,6 +605,9 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         jPopupMenu1 = new javax.swing.JPopupMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
+        pmHDCT = new javax.swing.JPopupMenu();
+        jMenuItem3 = new javax.swing.JMenuItem();
+        jMenuItem4 = new javax.swing.JMenuItem();
         jLabel1 = new javax.swing.JLabel();
         tabs = new javax.swing.JTabbedPane();
         jPanel4 = new javax.swing.JPanel();
@@ -583,6 +655,12 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         jMenuItem2.setText("jMenuItem2");
         jPopupMenu1.add(jMenuItem2);
 
+        jMenuItem3.setText("jMenuItem3");
+        pmHDCT.add(jMenuItem3);
+
+        jMenuItem4.setText("jMenuItem4");
+        pmHDCT.add(jMenuItem4);
+
         setBackground(new java.awt.Color(51, 51, 51));
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
@@ -608,16 +686,14 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
             Class[] types = new Class [] {
                 java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Double.class, java.lang.Object.class, java.lang.Object.class
             };
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false
-            };
 
             public Class getColumnClass(int columnIndex) {
                 return types [columnIndex];
             }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
+        });
+        tblHDCT.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblHDCTMouseClicked(evt);
             }
         });
         jScrollPane1.setViewportView(tblHDCT);
@@ -889,15 +965,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
             new String [] {
                 "Mã DH", "Tên KH", "Tên NV", "Thành tiền"
             }
-        ) {
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false
-            };
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
+        ));
         tblHD.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tblHDMouseClicked(evt);
@@ -1203,6 +1271,14 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         them();
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void tblHDCTMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblHDCTMouseClicked
+        this.rowHDCT = tblHDCT.rowAtPoint(evt.getPoint());
+        System.out.println(rowHDCT);
+        if (SwingUtilities.isRightMouseButton(evt)) {
+            hienPMSX(evt);
+        }
+    }//GEN-LAST:event_tblHDCTMouseClicked
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnTaoDon;
@@ -1225,6 +1301,8 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -1235,6 +1313,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JPopupMenu pmHDCT;
     private javax.swing.JRadioButton rdoGiaoHang;
     private javax.swing.JRadioButton rdoTaiQuay;
     private javax.swing.JTabbedPane tabs;
