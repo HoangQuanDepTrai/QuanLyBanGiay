@@ -418,15 +418,7 @@ public class TraHang extends javax.swing.JPanel {
             new String [] {
                 "Mã HDCT", "Mã HD", "Tên KH", "Số lượng ", "Tổng tiền trả"
             }
-        ) {
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false, false
-            };
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
+        ));
         tblHoanTra.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 tblHoanTraMousePressed(evt);
