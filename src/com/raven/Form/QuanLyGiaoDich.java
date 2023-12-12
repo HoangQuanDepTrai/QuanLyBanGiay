@@ -118,7 +118,7 @@ public class QuanLyGiaoDich extends javax.swing.JPanel {
         hd.setMaHD(Integer.parseInt(txtMaHD.getText()));
         hd.setHinhThuc(rdoTaiQuay.isSelected());
         hd.setPhiGiao(Double.parseDouble(txtPhi.getText()));
-        hd.setThanhTien(Double.parseDouble(txtThanhTien.getText()));
+        hd.setThanhTien(getThanhTien());
         hd.setTienKhachTra(Double.parseDouble(txtTienKhachTra.getText()));
         hd.setNgayTao(dcNgayTao.getDate());
         hd.setGioTao(XDate.toDate(txtGioTao.getText(), "hh:MM:ss"));
