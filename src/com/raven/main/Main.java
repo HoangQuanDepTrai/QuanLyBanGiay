@@ -31,7 +31,7 @@ import javax.swing.JPanel;
  * @author Lê Minh Khôi
  */
 public class Main extends javax.swing.JFrame {
-
+    
     public static boolean welcomeDialogShown = false;
 
     /**
@@ -72,28 +72,29 @@ public class Main extends javax.swing.JFrame {
                     }
                     setForm(new ThongKe());
                 }
-
+                
             }
-
+            
         });
     }
-
+    
     private void ketThuc() {
         this.dispose();
     }
-
+    
     private void showDangNhap() {
         new DangNhap(this, true).setVisible(true);
     }
-
+    
     private void showDoiMatKhau() {
         new DoiMatKhau(this, true).setVisible(true);
     }
-
+    
     public void showGiaoHang() {
-        new GiaoHangJDialog(this, true).setVisible(true);
+//        new GiaoHangJDialog(this, true).setVisible(true);
+        new com.raven.Form.KhachHang(this, true).setVisible(true);
     }
-
+    
     private void setForm(JComponent com) {
         mainPanel.removeAll();
         mainPanel.add(com);

@@ -14,7 +14,8 @@ import java.util.List;
  *
  * @author Lê Minh Khôi
  */
-public class KhachHangDao extends RavenDao<KhachHang, Integer>{
+public class KhachHangDao extends RavenDao<KhachHang, Integer> {
+
     final String INSERT_SQL = "INSERT INTO KHACHHANG (TENKH, SODT, DIACHI) VALUES (?, ?, ?)";
     final String UPDATE_SQL = "UPDATE KHACHHANG SET TENKH = ?, SODT = ?, DIACHI = ? WHERE MAKH = ?";
     final String DELETE_SQL = "DELETE FROM KHACHHANG WHERE MAKH = ?";
@@ -24,12 +25,12 @@ public class KhachHangDao extends RavenDao<KhachHang, Integer>{
 
     @Override
     public void insert(KhachHang entity) {
-        JdbcHelper.update(INSERT_SQL, entity.getTenKH(),entity.getSDT(),entity.getDchi());
+        JdbcHelper.update(INSERT_SQL, entity.getTenKH(), entity.getSDT(), entity.getDchi());
     }
 
     @Override
     public void update(KhachHang entity) {
-        JdbcHelper.update(UPDATE_SQL, entity.getTenKH(),entity.getSDT(),entity.getDchi(),entity.getMaKH());
+        JdbcHelper.update(UPDATE_SQL, entity.getTenKH(), entity.getSDT(), entity.getDchi(), entity.getMaKH());
     }
 
     @Override
@@ -50,8 +51,13 @@ public class KhachHangDao extends RavenDao<KhachHang, Integer>{
         }
         return list.get(0);
     }
-    
-     public KhachHang selectKHMoi() {
+
+    public List<KhachHang> selectByKeyword(String keyword) {
+        String SQL = "SELECT * FROM KHACHHANG WHERE TENKH LIKE ?";
+        return this.selectBysql(SQL, "%" + keyword + "%");
+    }
+
+    public KhachHang selectKHMoi() {
         List<KhachHang> list = selectBysql(SELECT_KH_MOI);
         if (list.isEmpty()) {
             return null;
@@ -61,7 +67,7 @@ public class KhachHangDao extends RavenDao<KhachHang, Integer>{
 
     @Override
     public List<KhachHang> selectBysql(String sql, Object... agrs) {
-       List<KhachHang> list = new ArrayList<>();
+        List<KhachHang> list = new ArrayList<>();
         try {
             ResultSet rs = JdbcHelper.query(sql, agrs);
             while (rs.next()) {
@@ -78,5 +84,5 @@ public class KhachHangDao extends RavenDao<KhachHang, Integer>{
         }
         return list;
     }
-    
+
 }
